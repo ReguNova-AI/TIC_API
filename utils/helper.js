@@ -28,7 +28,7 @@ const getOtp = () => {
 
 const getToken = (data) => {
   let jwtSecretKey = process.env.JWT_SECRET_KEY;
-  let token = jwt.sign(data, jwtSecretKey, { expiresIn: '200d' });
+  let token = jwt.sign(data, jwtSecretKey, { expiresIn: '1d' });
   return token;
 };
 

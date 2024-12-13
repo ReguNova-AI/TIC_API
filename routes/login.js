@@ -31,14 +31,15 @@ router.post('/api/v1/login', async (req, res) => {
     let statusCode = '';
     let customResponse = {};
     if (email && password) {
-      const { jwtToken, refreshToken, userDetails } = await loginService(
+      // validations for email and password
+      const { token, refreshToken, userDetails } = await loginService(
         email,
         password,
       );
       if (userDetails) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
-        data.token = jwtToken;
+        data.token = token;
         data.refreshToken = refreshToken;
         data.userDetails = userDetails;
       } else {
@@ -65,7 +66,7 @@ router.post('/api/v1/login', async (req, res) => {
   }
 });
 
-router.post('/forgotPassword/sendOtp', async (req, res) => {
+router.post('/api/v1/forgotPassword/sendOtp', async (req, res) => {
   try {
     const {
       body: { email = '', password = '' },
@@ -102,7 +103,7 @@ router.post('/forgotPassword/sendOtp', async (req, res) => {
   }
 });
 
-router.post('/forgotPassword/verifyOtp', async (req, res) => {
+router.post('/api/v1/forgotPassword/verifyOtp', async (req, res) => {
   try {
     const {
       body: { email = '', otp = '' },
