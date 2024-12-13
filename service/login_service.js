@@ -12,12 +12,16 @@ const loginService = async (email, password) => {
     let loginParams = { email, password };
     let loginResObj = {};
 
-    const userDetails = await loginQuery('GET_USER_DETAILS', loginParams);
-    if (userDetails) {
+    const userDetails =
+      (await loginQuery('GET_USER_DETAILS', loginParams)) || [];
+    const [{ user_id = 0 } = {}] = userDetails;
+    if (Array.isArray(userDetails) && userDetails.length > 0) {
       let data = {
         email,
-        user_id: userDetails[0].user_id,
+        user_id,
       };
+
+      // what and all we have to consider for generating the tokens
 
       const token = getToken(data);
       const refreshToken = getRefreshToken(data);
@@ -27,10 +31,10 @@ const loginService = async (email, password) => {
         .digest('hex');
       await loginQuery('UPDATE_REFRESH_TOKEN', {
         refreshTokenHash,
-        userId: data.user_id,
+        userId: user_id,
       });
 
-      loginResObj.jwtToken = token;
+      loginResObj.token = token;
       loginResObj.refreshToken = refreshToken;
       loginResObj.userDetails = userDetails;
     }

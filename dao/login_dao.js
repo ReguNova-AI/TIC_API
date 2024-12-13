@@ -16,8 +16,6 @@ const loginQuery = async (queryType, params = {}) => {
                     u.user_phone_no,
                     u.user_profile,
                     u.user_address,
-                    u.is_created_by_admin,
-                    u.is_Super_Admin,
                     u.created_date,
                     u.updated_date,
                     o.org_id,
@@ -39,7 +37,7 @@ const loginQuery = async (queryType, params = {}) => {
                     u.user_email = '${params.email}' and u.user_password = '${params.password}';`;
         break;
       case 'UPDATE_REFRESH_TOKEN':
-        query1 = `UPDATE users SET refresh_token = '${params.refreshTokenHash}' 
+        query1 = `UPDATE users SET refreshToken = '${params.refreshTokenHash}' 
                 WHERE user_id = ${params.userId};`;
         break;
       case 'CHECK_IF_USER_EXISTS':

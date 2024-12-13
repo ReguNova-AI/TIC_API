@@ -26,18 +26,25 @@ app.use((req, res, next) => {
     body: { email = 'NA' },
   } = req;
   const start = new Date();
-  console.log(
+  logger.info(
     `Start Time: ${start.toISOString()} Path: ${req.url} User: ${email}`,
   );
-  res.on('finish', function () {
-    const end = new Date();
-    const timeTaken = `${end - start}ms`;
-    logger.info(
-      `End Time: ${end.toISOString()} Path: ${req.url} Time Taken: ${timeTaken} Response Status: ${
-        this.statusCode
-      } User: ${email}`,
-    );
-  });
+  const { path = '', headers: { authorization = null } = {} } = req;
+  if (
+    path === '/api/v1/login' ||
+    path === '/api/v1/forgotPassword/sendOtp' ||
+    path === '/api/v1/forgotPassword/verifyOtp' ||
+    path === '/api/v1/resetPassword' || 
+  )
+    res.on('finish', function () {
+      const end = new Date();
+      const timeTaken = `${end - start}ms`;
+      logger.info(
+        `End Time: ${end.toISOString()} Path: ${req.url} Time Taken: ${timeTaken} Response Status: ${
+          this.statusCode
+        } User: ${email}`,
+      );
+    });
   next();
 });
 
