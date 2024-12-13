@@ -69,7 +69,7 @@ router.post('/api/v1/login', async (req, res) => {
 router.post('/api/v1/forgotPassword/sendOtp', async (req, res) => {
   try {
     const {
-      body: { email = '', password = '' },
+      body: { email = '' },
     } = req;
     let data = {};
     let responseType = '';

@@ -34,7 +34,9 @@ app.use((req, res, next) => {
     path === '/api/v1/login' ||
     path === '/api/v1/forgotPassword/sendOtp' ||
     path === '/api/v1/forgotPassword/verifyOtp' ||
-    path === '/api/v1/resetPassword' || 
+    path === '/api/v1/resetPassword' ||
+    path === '/api/v1/refreshToken' ||
+    path === '/api/v1/logout'
   )
     res.on('finish', function () {
       const end = new Date();
