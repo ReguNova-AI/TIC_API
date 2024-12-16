@@ -36,6 +36,10 @@ const loginQuery = async (queryType, params = {}) => {
                 WHERE 
                     u.user_email = '${params.email}' and u.user_password = '${params.password}';`;
         break;
+      case 'UPDATE_USER_TOKEN':
+        query1 = `UPDATE users SET token = '${params.tokenHash}' 
+                WHERE user_id = ${params.userId};`;
+        break;
       case 'UPDATE_REFRESH_TOKEN':
         query1 = `UPDATE users SET refreshToken = '${params.refreshTokenHash}' 
                 WHERE user_id = ${params.userId};`;

@@ -14,8 +14,10 @@ const {
   STATUS_CODE_SUCCESS,
   STATUS_CODE_BAD_REQUEST,
   LOGIN_SUCCESS,
-  INVALID_PASSWORD,
+  USER_NOT_FOUND,
   STATUS_CODE_INVALID_SUCCESS,
+  STATUS_CODE_INTERNAL_SERVER_ERROR,
+  INVALID_DETAILS,
   CUSTOM_RESPONSE,
 } = require('../constants/response_constants');
 const { logger } = require('../utils/logger');
@@ -32,11 +34,11 @@ router.post('/api/v1/login', async (req, res) => {
     let customResponse = {};
     if (email && password) {
       // validations for email and password
-      const { token, refreshToken, userDetails } = await loginService(
+      const { token, refreshToken, userDetails, user_id } = await loginService(
         email,
         password,
       );
-      if (userDetails) {
+      if (userDetails && user_id > 0) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
         data.token = token;
@@ -44,14 +46,16 @@ router.post('/api/v1/login', async (req, res) => {
         data.userDetails = userDetails;
       } else {
         responseType = CUSTOM_RESPONSE;
-        statusCode = STATUS_CODE_INVALID_SUCCESS;
+        statusCode = STATUS_CODE_INTERNAL_SERVER_ERROR;
         customResponse.statusCode = statusCode;
-        customResponse.message = INVALID_PASSWORD;
-        customResponse.messageCode = STATUS_CODE_INVALID_SUCCESS;
+        customResponse.message = USER_NOT_FOUND;
+        customResponse.messageCode = STATUS_CODE_INTERNAL_SERVER_ERROR;
       }
     } else {
       responseType = BAD_REQUEST;
       statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.statusCode = statusCode;
+      customResponse.message = INVALID_DETAILS;
     }
     let response = setResponse(
       responseType,
@@ -88,7 +92,7 @@ router.post('/api/v1/forgotPassword/sendOtp', async (req, res) => {
         statusCode = STATUS_CODE_BAD_REQUEST;
         customResponse.statusCode = statusCode;
         customResponse.message = 'Failed to send OTP email';
-        customResponse.messageCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.messageCode = statusCode;
       }
     } else {
       responseType = BAD_REQUEST;
