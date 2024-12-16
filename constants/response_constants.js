@@ -10,8 +10,10 @@ module.exports = Object.freeze({
   LOGIN_SUCCESS: 'Login Successful',
   INVALID_DETAILS: 'Invalid Details, Please check the details',
   INVALID_PASSWORD: 'Invalid Password',
+  INVALID_EMAIL: 'Invalid Email, Please check',
   USER_NOT_FOUND: 'User not found',
   STATUS_CODE_INTERNAL_SERVER_ERROR: 500,
   REFRESH_TOKEN_INVALID: 'Invalid Refresh Token',
   REFRESH_TOKEN_EXPIRED: 'Session Expired, Please login',
+  RESET_PASSWORD_SUCCESS: 'Reset password successfully',
 });
