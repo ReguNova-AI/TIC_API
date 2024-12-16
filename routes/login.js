@@ -19,6 +19,7 @@ const {
   STATUS_CODE_INTERNAL_SERVER_ERROR,
   INVALID_DETAILS,
   CUSTOM_RESPONSE,
+  RESET_PASSWORD_SUCCESS,
 } = require('../constants/response_constants');
 const { logger } = require('../utils/logger');
 

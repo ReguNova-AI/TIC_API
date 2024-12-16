@@ -14,7 +14,7 @@ const loginService = async (email, password) => {
 
     const userDetails =
       (await loginQuery('GET_USER_DETAILS', loginParams)) || [];
-    const [{ user_id = 0 } = {}] = userDetails;
+    const user_id = userDetails[0].user_id;
     if (Array.isArray(userDetails) && userDetails.length > 0) {
       let data = {
         email,
@@ -100,17 +100,19 @@ const verifyOtpService = async (params) => {
 
     if (userId) {
       const { otp } = params;
+      params.userId = userId;
 
-      const providedOtpHash = crypto
-        .createHash('md5')
-        .update(otp)
-        .digest('hex');
+      // const providedOtpHash = crypto
+      //   .createHash('md5')
+      //   .update(otp)
+      //   .digest('hex');
 
       // const isOtpNotExpired = new Date() <= new Date(otpExpiry);
-      // if (storedOtpHash === providedOtpHash && isOtpNotExpired) {
-      //   data.isOtpValid = true;
-      await forgotPasswordQuery('CLEAR_USER_OTP', { userId });
-      // }
+      // if (storedOtpHash === params.otp && isOtpNotExpired) {
+      if (storedOtpHash === params.otp) {
+        data.isOtpValid = true;
+        await forgotPasswordQuery('CLEAR_USER_OTP', { userId });
+      }
     }
 
     return data;
@@ -196,17 +198,16 @@ const refreshTokenService = async (accessToken, refreshToken) => {
 
 const resetPasswordService = async (params) => {
   try {
-    const { email, password } = params;
     const [{ user_id: userId = 0 } = {}] = await loginQuery(
       'CHECK_IF_USER_EXISTS',
       params,
     );
     if (userId > 0) {
-      const passwordHash = crypto
-        .createHash('md5')
-        .update(password)
-        .digest('hex');
-      const passwordParams = { passwordHash, userId };
+      // const passwordHash = crypto
+      //   .createHash('md5')
+      //   .update(password)
+      //   .digest('hex');
+      const passwordParams = { passwordHash: params.password, userId };
       await forgotPasswordQuery('UPDATE_USER_PASSWORD', passwordParams);
       return true;
     } else {

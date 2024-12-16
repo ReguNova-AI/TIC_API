@@ -38,14 +38,14 @@ const loginQuery = async (queryType, params = {}) => {
         break;
       case 'UPDATE_USER_TOKEN':
         query1 = `UPDATE users SET token = '${params.tokenHash}' 
-                WHERE user_id = ${params.userId};`;
+                WHERE user_id = ${params.user_id};`;
         break;
       case 'UPDATE_REFRESH_TOKEN':
         query1 = `UPDATE users SET refreshToken = '${params.refreshTokenHash}' 
                 WHERE user_id = ${params.userId};`;
         break;
       case 'CHECK_IF_USER_EXISTS':
-        query1 = `SELECT user_id FROM users WHERE user_email = '${params.email};`;
+        query1 = `SELECT user_id FROM users WHERE user_email = '${params.email}';`;
         break;
     }
 
@@ -82,6 +82,12 @@ const forgotPasswordQuery = async (queryType, params = {}) => {
         break;
       case 'VERIFY_USER_PASSWORD':
         query1 = `SELECT user_id FROM users WHERE user_id = ${params.userId} AND user_password = '${params.userPassword}';`;
+        break;
+      case 'GET_USER_OTP_DETAILS':
+        query1 = `SELECT user_id, otpHash FROM users WHERE user_email = '${params.email}';`;
+        break;
+      case 'CLEAR_USER_OTP':
+        query1 = `UPDATE users SET otpHash = NULL WHERE user_id = '${params.userId}';`;
         break;
     }
 
