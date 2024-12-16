@@ -6,6 +6,7 @@ const { smtpTransporter } = require('../config/aws_config');
 const { loginQuery, forgotPasswordQuery } = require('../dao/login_dao');
 const { logger } = require('../utils/logger');
 const { getOtp, getToken, getRefreshToken } = require('../utils/helper');
+const { TOKEN_EXPIRED_ERR } = require('../constants/response_constants');
 
 const loginService = async (email, password) => {
   try {
@@ -24,16 +25,16 @@ const loginService = async (email, password) => {
       // what and all we have to consider for generating the tokens
 
       const token = getToken(data);
-      const tokenHash = crypto.createHash('md5').update(token).digest('hex');
-      await loginQuery('UPDATE_USER_TOKEN', { tokenHash, user_id });
+      // const tokenHash = crypto.createHash('md5').update(token).digest('hex');
+      await loginQuery('UPDATE_USER_TOKEN', { tokenHash: token, user_id });
       const refreshToken = getRefreshToken(data);
-      const refreshTokenHash = crypto
-        .createHash('md5')
-        .update(refreshToken)
-        .digest('hex');
+      // const refreshTokenHash = crypto
+      //   .createHash('md5')
+      //   .update(refreshToken)
+      //   .digest('hex');
       await loginQuery('UPDATE_REFRESH_TOKEN', {
-        refreshTokenHash,
-        userId: user_id,
+        refreshTokenHash: refreshToken,
+        user_id,
       });
 
       loginResObj.token = token;
@@ -52,7 +53,7 @@ const forgotPasswordService = async (params) => {
     let data = {
       isEmailSent: false,
     };
-    const [{ user_id: userId = 0 }] = await forgotPasswordQuery(
+    const [{ user_id: userId = 0 }] = await loginQuery(
       'CHECK_IF_USER_EXISTS',
       params,
     );
@@ -122,9 +123,8 @@ const verifyOtpService = async (params) => {
   }
 };
 
-const refreshTokenService = async (accessToken, refreshToken) => {
+const refreshTokenService = async (refreshToken) => {
   try {
-    let jwtSecretKey = process.env.JWT_SECRET_KEY;
     let jwtRefreshSecretKey = process.env.JWT_REFRESH_SECRET_KEY;
     let data = {
       isExpired: true,
@@ -133,64 +133,64 @@ const refreshTokenService = async (accessToken, refreshToken) => {
     };
     let token = '';
     let refreshTokenNew = '';
-    await jwt.verify(accessToken, jwtSecretKey, async (err) => {
-      if (err) {
-        if (err.toString() == TOKEN_EXPIRED_ERR) {
-          await jwt.verify(
-            refreshToken,
-            jwtRefreshSecretKey,
-            async (err, decoded) => {
-              if (err) {
-                if (err.toString() == TOKEN_EXPIRED_ERR) {
-                  data.isRefreshExpired = true;
-                } else {
-                  data.isRefreshValid = false;
-                }
-              } else {
-                const { email = null } = decoded;
-                if (email) {
-                  let checkRefreshTokenParams = { email };
-                  const [
-                    {
-                      id: personId = null,
-                      refreshToken: referenceRefreshToken = null,
-                    } = {},
-                  ] = await registerQuery(
-                    'CHECK_USER',
-                    checkRefreshTokenParams,
-                  );
-                  const comparisionToken = crypto
-                    .createHash('md5')
-                    .update(refreshToken)
-                    .digest('hex');
-                  if (comparisionToken === referenceRefreshToken) {
-                    let tokenData = { email, userId: personId };
-                    token = getToken(tokenData);
-                    refreshTokenNew = getRefreshToken(tokenData);
-                    const refreshTokenNewHash = crypto
-                      .createHash('md5')
-                      .update(refreshTokenNew)
-                      .digest('hex');
-                    await loginQuery('UPDATE_REFRESH_TOKEN', {
-                      refreshTokenNewHash,
-                      personId,
-                    });
-                  } else {
-                    data.isRefreshValid = false;
-                  }
-                } else {
-                  data.isRefreshValid = false;
-                }
-              }
-            },
-          );
+    await jwt.verify(
+      refreshToken,
+      jwtRefreshSecretKey,
+      async (err, decoded) => {
+        if (err) {
+          if (err.toString() == TOKEN_EXPIRED_ERR) {
+            data.isRefreshExpired = true;
+          } else {
+            data.isRefreshValid = false;
+          }
+        } else {
+          const { email = null } = decoded;
+          if (email) {
+            let checkRefreshTokenParams = { email };
+            const [
+              {
+                user_id = null,
+                refreshToken: referenceRefreshToken = null,
+              } = {},
+            ] = await loginQuery(
+              'CHECK_IF_USER_EXISTS',
+              checkRefreshTokenParams,
+            );
+            // const comparisionToken = crypto
+            //   .createHash('md5')
+            //   .update(refreshToken)
+            //   .digest('hex');
+            if (refreshToken === referenceRefreshToken) {
+              let tokenData = { email, user_id };
+              token = getToken(tokenData);
+              refreshTokenNew = getRefreshToken(tokenData);
+              // const tokenNewHash = crypto
+              //   .createHash('md5')
+              //   .update(token)
+              //   .digest('hex');
+              await loginQuery('UPDATE_USER_TOKEN', {
+                tokenHash: token,
+                user_id,
+              });
+              // const refreshTokenNewHash = crypto
+              //   .createHash('md5')
+              //   .update(refreshTokenNew)
+              //   .digest('hex');
+              await loginQuery('UPDATE_REFRESH_TOKEN', {
+                refreshTokenHash: refreshTokenNew,
+                user_id,
+              });
+            } else {
+              data.isRefreshValid = false;
+            }
+          } else {
+            data.isRefreshValid = false;
+          }
         }
-      } else {
-        data.isExpired = false;
-      }
-    });
+      },
+    );
     data.token = token;
-    data.refreshToken = refreshTokenNew;
+    data.refreshTokenNew = refreshTokenNew;
   } catch (err) {
     logger.error('Refresh token service error:', err);
   }

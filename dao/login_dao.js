@@ -16,6 +16,8 @@ const loginQuery = async (queryType, params = {}) => {
                     u.user_phone_no,
                     u.user_profile,
                     u.user_address,
+                    u.token,
+                    u.refreshToken,
                     u.created_date,
                     u.updated_date,
                     o.org_id,
@@ -42,10 +44,10 @@ const loginQuery = async (queryType, params = {}) => {
         break;
       case 'UPDATE_REFRESH_TOKEN':
         query1 = `UPDATE users SET refreshToken = '${params.refreshTokenHash}' 
-                WHERE user_id = ${params.userId};`;
+                WHERE user_id = ${params.user_id};`;
         break;
       case 'CHECK_IF_USER_EXISTS':
-        query1 = `SELECT user_id FROM users WHERE user_email = '${params.email}';`;
+        query1 = `SELECT user_id, refreshToken FROM users WHERE user_email = '${params.email}';`;
         break;
     }
 
@@ -71,14 +73,11 @@ const forgotPasswordQuery = async (queryType, params = {}) => {
   try {
     let query1 = '';
     switch (queryType) {
-      case 'CHECK_IF_USER_EXISTS':
-        query1 = `SELECT user_id FROM users WHERE user_email = '${params.email}';`;
-        break;
       case 'UPDATE_USER_OTP':
         query1 = `UPDATE users SET otpHash = '${params.userHash}' WHERE user_id = ${params.userId};`;
         break;
       case 'UPDATE_USER_PASSWORD':
-        query1 = `UPDATE users SET user_password = '${params.userPassword}' WHERE user_id = ${params.userId};`;
+        query1 = `UPDATE users SET user_password = '${params.passwordHash}' WHERE user_id = ${params.userId};`;
         break;
       case 'VERIFY_USER_PASSWORD':
         query1 = `SELECT user_id FROM users WHERE user_id = ${params.userId} AND user_password = '${params.userPassword}';`;

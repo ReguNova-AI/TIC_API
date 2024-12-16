@@ -16,4 +16,5 @@ module.exports = Object.freeze({
   REFRESH_TOKEN_INVALID: 'Invalid Refresh Token',
   REFRESH_TOKEN_EXPIRED: 'Session Expired, Please login',
   RESET_PASSWORD_SUCCESS: 'Reset password successfully',
+  TOKEN_EXPIRED_ERR: 'TokenExpiredError: jwt expired',
 });
