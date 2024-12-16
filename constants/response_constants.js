@@ -8,7 +8,10 @@ module.exports = Object.freeze({
   STATUS_CODE_INVALID_SUCCESS: 201,
   STATUS_CODE_UNAUTHORISED: 401,
   LOGIN_SUCCESS: 'Login Successful',
+  INVALID_DETAILS: 'Invalid Details, Please check the details',
   INVALID_PASSWORD: 'Invalid Password',
+  USER_NOT_FOUND: 'User not found',
+  STATUS_CODE_INTERNAL_SERVER_ERROR: 500,
   REFRESH_TOKEN_INVALID: 'Invalid Refresh Token',
-  REFRESH_TOKEN_EXPIRED: 'Session Expired, Please login'
+  REFRESH_TOKEN_EXPIRED: 'Session Expired, Please login',
 });

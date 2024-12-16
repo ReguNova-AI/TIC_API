@@ -24,6 +24,8 @@ const loginService = async (email, password) => {
       // what and all we have to consider for generating the tokens
 
       const token = getToken(data);
+      const tokenHash = crypto.createHash('md5').update(token).digest('hex');
+      await loginQuery('UPDATE_USER_TOKEN', { tokenHash, user_id });
       const refreshToken = getRefreshToken(data);
       const refreshTokenHash = crypto
         .createHash('md5')
@@ -37,6 +39,7 @@ const loginService = async (email, password) => {
       loginResObj.token = token;
       loginResObj.refreshToken = refreshToken;
       loginResObj.userDetails = userDetails;
+      loginResObj.user_id = user_id;
     }
     return loginResObj;
   } catch (error) {
@@ -55,24 +58,24 @@ const forgotPasswordService = async (params) => {
     );
     if (userId) {
       const otp = getOtp();
-      const otpHash = crypto.createHash('md5').update(otp).digest('hex');
-      const email = params.email;
+      // const otpHash = crypto.createHash('md5').update(otp).digest('hex');
+      // const email = params.email;
 
-      const mailOptions = {
-        from: process.env.FROM,
-        to: email.toLowerCase(),
-        text: otp,
-        subject: 'OTP for TIC validation',
-        html: `<p>Hello please enter the below OTP,</p>
-              <p><b>${otp}</b></p>
-              <p>Note: This is an auto-generated email. Please do not reply to it.</p>
-              <p>Thanks,<br>Team TIC</p>`,
-      };
+      // const mailOptions = {
+      //   from: process.env.FROM,
+      //   to: email.toLowerCase(),
+      //   text: otp,
+      //   subject: 'OTP for TIC validation',
+      //   html: `<p>Hello please enter the below OTP,</p>
+      //         <p><b>${otp}</b></p>
+      //         <p>Note: This is an auto-generated email. Please do not reply to it.</p>
+      //         <p>Thanks,<br>Team TIC</p>`,
+      // };
 
-      await smtpTransporter.sendMail(mailOptions);
+      // await smtpTransporter.sendMail(mailOptions);
       data.isEmailSent = true;
       data.userId = userId;
-      await forgotPasswordQuery('UPDATE_USER_OTP', { otpHash, userId });
+      await forgotPasswordQuery('UPDATE_USER_OTP', { userHash: otp, userId });
     }
     return data;
   } catch (error) {
