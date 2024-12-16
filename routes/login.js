@@ -20,6 +20,10 @@ const {
   INVALID_DETAILS,
   CUSTOM_RESPONSE,
   RESET_PASSWORD_SUCCESS,
+  STATUS_CODE_UNAUTHORISED,
+  REFRESH_TOKEN_EXPIRED,
+  REFRESH_TOKEN_INVALID,
+  INVALID_EMAIL,
 } = require('../constants/response_constants');
 const { logger } = require('../utils/logger');
 
@@ -190,19 +194,19 @@ router.post('/api/v1/resetPassword', async (req, res) => {
 router.get('/api/v1/refreshToken', async (req, res) => {
   try {
     const {
-      headers: { accesstoken = '', refreshtoken = '' },
+      body: { refreshToken = '' },
     } = req;
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
     let data = {};
-    if (accesstoken && refreshtoken) {
+    if (refreshToken) {
       const {
         isRefreshValid = false,
         isRefreshExpired = false,
         token = null,
-        refreshToken = null,
-      } = await refreshTokenService(accesstoken, refreshtoken);
+        refreshTokenNew = null,
+      } = await refreshTokenService(refreshToken);
       if (isRefreshExpired) {
         responseType = CUSTOM_RESPONSE;
         statusCode = STATUS_CODE_UNAUTHORISED;
@@ -211,7 +215,7 @@ router.get('/api/v1/refreshToken', async (req, res) => {
         customResponse.messageCode = STATUS_CODE_UNAUTHORISED;
       } else if (isRefreshValid) {
         data.token = token;
-        data.refreshToken = refreshToken;
+        data.refreshTokenNew = refreshTokenNew;
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
       } else {
@@ -219,7 +223,7 @@ router.get('/api/v1/refreshToken', async (req, res) => {
         statusCode = STATUS_CODE_INVALID_SUCCESS;
         customResponse.statusCode = statusCode;
         customResponse.message = REFRESH_TOKEN_INVALID;
-        customResponse.messageCode = MESSAGE_CODE_INVALID_SUCCESS;
+        customResponse.messageCode = STATUS_CODE_INVALID_SUCCESS;
       }
     } else {
       responseType = BAD_REQUEST;
