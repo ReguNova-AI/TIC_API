@@ -11,6 +11,16 @@ const projectService = async (params) => {
   }
 };
 
+const getProjectService = async (params) => {
+  try {
+    const res = await projectQuery('GET_PROJECTS', params);
+    return res;
+  } catch (error) {
+    logger.error('Project service', error);
+  }
+};
+
 module.exports = {
   projectService,
+  getProjectService,
 };

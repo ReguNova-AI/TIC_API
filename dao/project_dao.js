@@ -8,7 +8,32 @@ const projectQuery = async (queryType, params = {}) => {
     let query1 = '';
     switch (queryType) {
       case 'GET_PROJECTS':
-        query1 = ``;
+        query1 = `SELECT 
+                    project_id, 
+                    project_name, 
+                    project_no, 
+                    project_description, 
+                    regulatory_standard, 
+                    invite_members, 
+                    documents, 
+                    org_id, 
+                    org_name, 
+                    created_by_id, 
+                    created_by_name, 
+                    sector_id, 
+                    sector_name, 
+                    industry_id, 
+                    industry_name, 
+                    status, 
+                    no_of_runs, 
+                    success_count, 
+                    fail_count, 
+                    last_run, 
+                    created_at, 
+                    updated_at, 
+                    mapping_standards, 
+                    summary_report
+                FROM projects`;
         break;
       case 'CREATE_PROJECT':
         query1 = `INSERT INTO projects (
