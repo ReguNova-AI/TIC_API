@@ -9,7 +9,7 @@ module.exports = Object.freeze({
   STATUS_CODE_UNAUTHORISED: 401,
   LOGIN_SUCCESS: 'Login Successful',
   INVALID_DETAILS: 'Invalid Details, Please check the details',
-  INVALID_PASSWORD: 'Invalid Password',
+  INVALID_PASSWORD: 'Invalid Password, Please check',
   INVALID_EMAIL: 'Invalid Email, Please check',
   USER_NOT_FOUND: 'User not found',
   STATUS_CODE_INTERNAL_SERVER_ERROR: 500,
