@@ -39,21 +39,20 @@ router.post('/api/v1/login', async (req, res) => {
     let customResponse = {};
     if (email && password) {
       // validations for email and password
-      const { token, refreshToken, userDetails, user_id } = await loginService(
-        email,
-        password,
-      );
+      const { token, refreshToken, userDetails, user_id, message } =
+        await loginService(email, password);
       if (userDetails && user_id > 0) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
         data.token = token;
         data.refreshToken = refreshToken;
         data.userDetails = userDetails;
+        data.message = 'Logged in successfully';
       } else {
         responseType = CUSTOM_RESPONSE;
         statusCode = STATUS_CODE_INTERNAL_SERVER_ERROR;
         customResponse.statusCode = statusCode;
-        customResponse.message = USER_NOT_FOUND;
+        customResponse.message = message;
         customResponse.messageCode = STATUS_CODE_INTERNAL_SERVER_ERROR;
       }
     } else {
