@@ -11,6 +11,7 @@ const { authenticate } = require('./config/authenticate');
 
 // Routes of the application
 const Login = require('./routes/login');
+const Project = require('./routes/project');
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -25,6 +26,7 @@ app.use(
 app.use(cors());
 app.use(helmet());
 app.use(Login);
+app.use(Project);
 
 app.use(async (req, res, next) => {
   const {
@@ -65,7 +67,7 @@ app.use(async (req, res, next) => {
       req.body.userDetails = details;
       res.on('finish', function () {
         const endTime = new Date();
-        const totalTime = endTime - startTime + 'ms';
+        const totalTime = endTime - start + 'ms';
         logger.info(
           `End Time: ${endTime.toISOString()}, Path: ${req.url}, Time Taken: ${totalTime}, Response Status: ${
             this.statusCode
