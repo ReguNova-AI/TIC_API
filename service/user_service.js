@@ -1,7 +1,6 @@
 const { logger } = require('../utils/logger');
 const { userQuery } = require('../dao/user_dao');
 
-// const {} = require('../constants/response_constants');
 const insertUserService = async (params) => {
   try {
     let data = {};
