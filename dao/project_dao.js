@@ -8,32 +8,11 @@ const projectQuery = async (queryType, params = {}) => {
     let query1 = '';
     switch (queryType) {
       case 'GET_PROJECTS':
-        query1 = `SELECT 
-                    project_id, 
-                    project_name, 
-                    project_no, 
-                    project_description, 
-                    regulatory_standard, 
-                    invite_members, 
-                    documents, 
-                    org_id, 
-                    org_name, 
-                    created_by_id, 
-                    created_by_name, 
-                    sector_id, 
-                    sector_name, 
-                    industry_id, 
-                    industry_name, 
-                    status, 
-                    no_of_runs, 
-                    success_count, 
-                    fail_count, 
-                    last_run, 
-                    created_at, 
-                    updated_at, 
-                    mapping_standards, 
-                    summary_report
-                FROM projects`;
+        query1 = `SELECT * FROM projects;`;
+        break;
+      case 'GET_SINGLE_PROJECT':
+        query1 = `SELECT * FROM projects 
+                  WHERE project_id = ${params.project_id};`;
         break;
       case 'CREATE_PROJECT':
         query1 = `INSERT INTO projects (
@@ -51,10 +30,7 @@ const projectQuery = async (queryType, params = {}) => {
                       sector_name, 
                       industry_id, 
                       industry_name, 
-                      status, 
-                      no_of_runs, 
-                      success_count, 
-                      fail_count, 
+                      status,
                       last_run, 
                       mapping_standards, 
                       summary_report
@@ -75,9 +51,6 @@ const projectQuery = async (queryType, params = {}) => {
                       ${params.industry_id},
                       '${params.industry_name}',
                       '${params.status}',
-                      ${params.no_of_runs},
-                      ${params.success_count},
-                      ${params.fail_count},
                       '${params.last_run}',
                       '${params.mapping_standards}',
                       '${JSON.stringify(params.summary_report)}'
