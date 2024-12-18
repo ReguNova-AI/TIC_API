@@ -13,6 +13,7 @@ const { authenticate } = require('./config/authenticate');
 const Login = require('./routes/login');
 const Project = require('./routes/project');
 const User = require('./routes/user');
+const Generic = require('./routes/generic');
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -29,6 +30,7 @@ app.use(helmet());
 app.use(Login);
 app.use(Project);
 app.use(User);
+app.use(Generic);
 
 app.use(async (req, res, next) => {
   const {
