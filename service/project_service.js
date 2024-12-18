@@ -4,8 +4,13 @@ const { projectQuery } = require('../dao/project_dao');
 // const {} = require('../constants/response_constants');
 const projectService = async (params) => {
   try {
-    const res = await projectQuery('CREATE_PROJECT', params);
-    return res;
+    let data = {};
+    const response = await projectQuery('CREATE_PROJECT', params);
+    let project_id = response?.insertId ? response.insertId : 0;
+    if (project_id) {
+      data = await projectQuery('GET_SINGLE_PROJECT', { project_id });
+    }
+    return data;
   } catch (error) {
     logger.error('Project service', error);
   }
@@ -13,14 +18,24 @@ const projectService = async (params) => {
 
 const getProjectService = async (params) => {
   try {
-    const res = await projectQuery('GET_PROJECTS', params);
-    return res;
+    const data = await projectQuery('GET_PROJECTS', params);
+    return data;
   } catch (error) {
     logger.error('Project service', error);
+  }
+};
+
+const getSingleProjectService = async (params) => {
+  try {
+    const data = await projectQuery('GET_SINGLE_PROJECT', params);
+    return data;
+  } catch (error) {
+    logger.error('Get Single project service', error);
   }
 };
 
 module.exports = {
   projectService,
   getProjectService,
+  getSingleProjectService,
 };
