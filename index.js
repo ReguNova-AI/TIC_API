@@ -12,6 +12,7 @@ const { authenticate } = require('./config/authenticate');
 // Routes of the application
 const Login = require('./routes/login');
 const Project = require('./routes/project');
+const User = require('./routes/user');
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -27,6 +28,7 @@ app.use(cors());
 app.use(helmet());
 app.use(Login);
 app.use(Project);
+app.use(User);
 
 app.use(async (req, res, next) => {
   const {
