@@ -19,6 +19,12 @@ const genericQuery = async (queryType, params = {}) => {
       case 'GET_SINGLE_INDUSTRY':
         query1 = `SELECT * FROM industries WHERE industry_id = ${params.industry_id};`;
         break;
+      case 'GET_SECTORS':
+        query1 = `SELECT * FROM sectors;`;
+        break;
+      case 'GET_SINGLE_SECTOR':
+        query1 = `SELECT * FROM sectors WHERE sector_id = ${params.sector_id};`;
+        break;
     }
 
     return new Promise((resolve, reject) => {
