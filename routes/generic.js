@@ -15,6 +15,8 @@ const {
   getSignleOrgService,
   getIndustryService,
   getSingleIndustryService,
+  getSectorsService,
+  getSingleSectorService,
 } = require('../service/generic_service');
 
 router.get('/api/v1/organizations', async (req, res) => {
@@ -159,6 +161,79 @@ router.get('/api/v1/industries/:industry_id', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('get single industry route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.get('/api/v1/sectors', async (req, res) => {
+  try {
+    const {
+      body: {},
+    } = req;
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    if (req.body) {
+      let res = await getSectorsService(req.body);
+      if (res) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.details = res;
+        data.message = 'Fetched Details Successfully';
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'Failed to get response';
+        customResponse.messageCode = statusCode;
+      }
+    } else {
+      responseType = BAD_REQUEST;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = 'Details are required';
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('get sectors route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.get('/api/v1/sectors/:sector_id', async (req, res) => {
+  try {
+    let {
+      params: { sector_id = null },
+    } = req;
+    sector_id = parseInt(sector_id);
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    if (sector_id) {
+      let res = await getSingleSectorService({ sector_id });
+      if (res) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.details = res;
+        data.message = 'Fetched Details Successfully';
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'Failed to get response';
+        customResponse.messageCode = statusCode;
+      }
+    } else {
+      responseType = BAD_REQUEST;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = 'Details are required';
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('get single sector route', err);
     res.status(500).send(err);
   }
 });

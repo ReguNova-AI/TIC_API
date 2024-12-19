@@ -37,9 +37,29 @@ const getSingleIndustryService = async (params) => {
   }
 };
 
-module.exports = {
-  getOrgService,
-  getSignleOrgService,
-  getIndustryService,
-  getSingleIndustryService,
-};
+  const getSectorsService = async (params) => {
+    try {
+      const data = await genericQuery('GET_SECTORS', params);
+      return data;
+    } catch (error) {
+      logger.error('get sectors service', error);
+    }
+  };
+
+  const getSingleSectorService = async (params) => {
+    try {
+      const data = await genericQuery('GET_SINGLE_SECTOR', params);
+      return data;
+    } catch (error) {
+      logger.error('get single sector service', error);
+    }
+  };
+
+  module.exports = {
+    getOrgService,
+    getSignleOrgService,
+    getIndustryService,
+    getSingleIndustryService,
+    getSectorsService,
+    getSingleSectorService,
+  };
