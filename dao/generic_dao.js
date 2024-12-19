@@ -13,12 +13,12 @@ const genericQuery = async (queryType, params = {}) => {
       case 'GET_SINGLE_ORGANIZATIONS':
         query1 = `SELECT * FROM organizations WHERE org_id = ${params.org_id};`;
         break;
-      // case '':
-      //   query1 = ``;
-      //   break;
-      // case '':
-      //   query1 = ``;
-      //   break;
+      case 'GET_INDUSTRIES':
+        query1 = `SELECT * FROM industries;`;
+        break;
+      case 'GET_SINGLE_INDUSTRY':
+        query1 = `SELECT * FROM industries WHERE industry_id = ${params.industry_id};`;
+        break;
     }
 
     return new Promise((resolve, reject) => {

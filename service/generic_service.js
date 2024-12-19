@@ -19,7 +19,27 @@ const getSignleOrgService = async (params) => {
   }
 };
 
+const getIndustryService = async (params) => {
+  try {
+    const data = await genericQuery('GET_INDUSTRIES', params);
+    return data;
+  } catch (error) {
+    logger.error('get industries service', error);
+  }
+};
+
+const getSingleIndustryService = async (params) => {
+  try {
+    const data = await genericQuery('GET_SINGLE_INDUSTRY', params);
+    return data;
+  } catch (error) {
+    logger.error('get single industry service', error);
+  }
+};
+
 module.exports = {
   getOrgService,
   getSignleOrgService,
+  getIndustryService,
+  getSingleIndustryService,
 };
