@@ -49,6 +49,9 @@ const loginQuery = async (queryType, params = {}) => {
       case 'CHECK_IF_USER_EXISTS':
         query1 = `SELECT user_id, refreshToken, user_password FROM users WHERE user_email = '${params.email}';`;
         break;
+      case 'USER_LOGOUT':
+        query1 = `UPDATE users SET token = NULL, refreshToken = NULL WHERE user_id = '${params.user_id}';`;
+        break;
     }
 
     return new Promise((resolve, reject) => {
