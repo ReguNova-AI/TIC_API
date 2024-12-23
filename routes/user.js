@@ -41,7 +41,6 @@ router.post('/api/v1/user/create', async (req, res) => {
       user_last_name &&
       user_email &&
       user_phone_no &&
-      user_password &&
       created_by
     ) {
       let res = await insertUserService(req.body);
