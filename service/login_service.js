@@ -232,10 +232,22 @@ const resetPasswordService = async (params) => {
   }
 };
 
+const logoutService = async (params) => {
+  try {
+    let isLoggedOut = false;
+    await loginQuery('USER_LOGOUT', params);
+    isLoggedOut = true;
+    return isLoggedOut;
+  } catch (error) {
+    logger.error('logout service', error);
+  }
+};
+
 module.exports = {
   loginService,
   forgotPasswordService,
   verifyOtpService,
   refreshTokenService,
   resetPasswordService,
+  logoutService,
 };

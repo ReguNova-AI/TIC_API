@@ -7,6 +7,7 @@ const {
   verifyOtpService,
   refreshTokenService,
   resetPasswordService,
+  logoutService,
 } = require('../service/login_service');
 const {
   SUCCESS,
@@ -237,6 +238,48 @@ router.get('/api/v1/refreshToken', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('get refreshToken route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.post('/api/v1/logout', async (req, res) => {
+  try {
+    const {
+      body: { user_id = null },
+    } = req;
+    let data = {}
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    if (user_id) {
+      const isLoggedOut = await logoutService({ user_id });
+      if (isLoggedOut) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.message = 'Logged out successfully';
+        data.isLoggedOut = isLoggedOut;
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_INTERNAL_SERVER_ERROR;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'Internal Server Error';
+        customResponse.messageCode = STATUS_CODE_INTERNAL_SERVER_ERROR;
+      }
+    } else {
+      responseType = BAD_REQUEST;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.statusCode = statusCode;
+      customResponse.message = INVALID_DETAILS;
+    }
+    let response = setResponse(
+      responseType,
+      LOGIN_SUCCESS,
+      data,
+      customResponse,
+    );
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('logout route', err);
     res.status(500).send(err);
   }
 });
