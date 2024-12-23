@@ -8,7 +8,7 @@ const uploadFileToS3 = async (documents) => {
       const fileContent = item;
       const fileName = `File_` + Math.random().toString(36).substring(6);
       const s3Params = {
-        Bucket: process.env.S3_BUCKET_NAME,
+        Bucket: process.env.BUCKET_NAME,
         Key: fileName,
         Body: fileContent,
       };
