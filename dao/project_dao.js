@@ -57,7 +57,28 @@ const projectQuery = async (queryType, params = {}) => {
         );`;
         break;
       case 'UPDATE_PROJECT':
-        query1 = ``;
+        query1 = `UPDATE projects
+                  SET 
+                      project_name = '${params.project_name}',
+                      project_no = '${params.project_no}',
+                      project_description = '${params.project_description}',
+                      regulatory_standard = '${JSON.stringify(params.regulatory_standard)}',
+                      invite_members = '${JSON.stringify(params.invite_members)}',
+                      documents = '${JSON.stringify(params.documents)}',
+                      org_id = ${params.org_id},
+                      org_name = '${params.org_name}',
+                      created_by_id = ${params.created_by_id},
+                      created_by_name = '${params.created_by_name}',
+                      sector_id = ${params.sector_id},
+                      sector_name = '${params.sector_name}',
+                      industry_id = ${params.industry_id},
+                      industry_name = '${params.industry_name}',
+                      status = '${params.status}',
+                      last_run = '${params.last_run}',
+                      mapping_standards = '${params.mapping_standards}',
+                      summary_report = '${JSON.stringify(params.summary_report)}',
+                      updated_at = CURRENT_TIMESTAMP
+                  WHERE project_id = ${params.project_id};`;
         break;
       case 'DELETE_PROJECT':
         query1 = ``;
