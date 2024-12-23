@@ -34,8 +34,23 @@ const getSingleProjectService = async (params) => {
   }
 };
 
+const projectUpdateService = async (params) => {
+  try {
+    let data = {};
+    await projectQuery('UPDATE_PROJECT', params);
+    let project_id = params.project_id;
+    if (project_id) {
+      data = await projectQuery('GET_SINGLE_PROJECT', { project_id });
+    }
+    return data;
+  } catch (error) {
+    logger.error('Project update service', error);
+  }
+};
+
 module.exports = {
   projectService,
   getProjectService,
   getSingleProjectService,
+  projectUpdateService,
 };

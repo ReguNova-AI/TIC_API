@@ -16,6 +16,7 @@ const {
   projectService,
   getProjectService,
   getSingleProjectService,
+  projectUpdateService,
 } = require('../service/project_service');
 
 router.post('/api/v1/project/create', async (req, res) => {
@@ -147,6 +148,54 @@ router.get('/api/v1/projects/:project_id', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('Get Single project route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.put('/api/v1/project/update', async (req, res) => {
+  try {
+    const {
+      body: {
+        project_name = null,
+        project_no = null,
+        project_description = null,
+        regulatory_standard = null,
+        project_id = null,
+      },
+    } = req;
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    if (
+      project_name &&
+      project_no &&
+      project_description &&
+      regulatory_standard &&
+      project_id
+    ) {
+      let response = await projectUpdateService(req.body);
+      if (response) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.details = response;
+        data.message = 'Project Updated Successfully';
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'Failed to create project';
+        customResponse.messageCode = statusCode;
+      }
+    } else {
+      responseType = BAD_REQUEST;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = 'Details are required';
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('Project update route', err);
     res.status(500).send(err);
   }
 });
