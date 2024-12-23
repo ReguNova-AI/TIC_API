@@ -25,6 +25,7 @@ const {
   REFRESH_TOKEN_EXPIRED,
   REFRESH_TOKEN_INVALID,
   INVALID_EMAIL,
+  LOGOUT_SUCCESS,
 } = require('../constants/response_constants');
 const { logger } = require('../utils/logger');
 
@@ -247,7 +248,7 @@ router.post('/api/v1/logout', async (req, res) => {
     const {
       body: { user_id = null },
     } = req;
-    let data = {}
+    let data = {};
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
@@ -256,7 +257,6 @@ router.post('/api/v1/logout', async (req, res) => {
       if (isLoggedOut) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
-        data.message = 'Logged out successfully';
         data.isLoggedOut = isLoggedOut;
       } else {
         responseType = CUSTOM_RESPONSE;
@@ -273,7 +273,7 @@ router.post('/api/v1/logout', async (req, res) => {
     }
     let response = setResponse(
       responseType,
-      LOGIN_SUCCESS,
+      LOGOUT_SUCCESS,
       data,
       customResponse,
     );
