@@ -1,9 +1,11 @@
 const { logger } = require('../utils/logger');
 const { userQuery } = require('../dao/user_dao');
+const { generateRandomPassword } = require('../utils/helper');
 
 const insertUserService = async (params) => {
   try {
     let data = {};
+    params.user_password = generateRandomPassword();
     const res = await userQuery('CREATE_USER', params);
     let user_id = res?.insertId ? res.insertId : 0;
     if (user_id) {
