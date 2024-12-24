@@ -30,13 +30,7 @@ app.use(
 );
 app.use(cors());
 app.use(helmet());
-app.use(Login);
-app.use(Project);
-app.use(User);
-app.use(Generic);
-app.use(Upload);
-app.use(Role);
-app.use(Certificate);
+
 
 app.use(async (req, res, next) => {
   const {
@@ -92,6 +86,14 @@ app.use(async (req, res, next) => {
     res.sendStatus(403);
   }
 });
+
+app.use(Login);
+app.use(Project);
+app.use(User);
+app.use(Generic);
+app.use(Upload);
+app.use(Role);
+app.use(Certificate);
 
 const port = process.env.SERVER_PORT;
 
