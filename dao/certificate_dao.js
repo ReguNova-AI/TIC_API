@@ -8,7 +8,7 @@ const certificate = async (queryType, params = {}) => {
     let query1 = '';
     switch (queryType) {
       case 'GET_CERTIFICATES':
-        query1 = `SELECT * FROM certificates${params.user_id ? ` WHERE created_by_id = ${params.user_id}` : ``};`;
+        query1 = `SELECT * FROM certificates WHERE created_by_id = ${params.user_id};`;
         break;
       case 'GET_SINGLE_CERTIFICATE':
         query1 = `SELECT * FROM certificates WHERE certificate_id = ${params.certificate_id};`;
