@@ -14,6 +14,7 @@ const {
   getSingleCertificateService,
   insertCertificateService,
 } = require('../service/certificate_service');
+const { validate } = require('../utils/helper');
 
 router.get('/api/v1/certificates', async (req, res) => {
   try {
@@ -24,8 +25,8 @@ router.get('/api/v1/certificates', async (req, res) => {
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    user_id = parseInt(user_id);
-    if (user_id) {
+    const { isValid, errors } = validate({}, {}, { user_id });
+    if (isValid) {
       let res = await getCertificateService({ user_id });
       if (res) {
         responseType = SUCCESS;
@@ -42,7 +43,10 @@ router.get('/api/v1/certificates', async (req, res) => {
     } else {
       responseType = BAD_REQUEST;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Details are required';
+      message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
@@ -57,12 +61,12 @@ router.get('/api/v1/certificates/:certificate_id', async (req, res) => {
     let {
       params: { certificate_id = null },
     } = req;
-    certificate_id = parseInt(certificate_id);
     let data = {};
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (certificate_id) {
+    const { isValid, errors } = validate({}, {}, { certificate_id });
+    if (isValid) {
       let res = await getSingleCertificateService({ certificate_id });
       if (res) {
         responseType = SUCCESS;
@@ -79,7 +83,10 @@ router.get('/api/v1/certificates/:certificate_id', async (req, res) => {
     } else {
       responseType = BAD_REQUEST;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Details are required';
+      message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
@@ -106,15 +113,18 @@ router.post('/api/v1/certificate/create', async (req, res) => {
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (
-      certificate_name &&
-      certificate_subject &&
-      certificate_status &&
-      issuer &&
-      file_url &&
-      file_name &&
-      created_by_id
-    ) {
+    const { isValid, errors } = validate(
+      {
+        certificate_name,
+        certificate_subject,
+        certificate_status,
+        file_url,
+        file_name,
+      },
+      {},
+      { created_by_id },
+    );
+    if (isValid) {
       let res = await insertCertificateService(req.body);
       if (res) {
         responseType = SUCCESS;
@@ -131,7 +141,10 @@ router.post('/api/v1/certificate/create', async (req, res) => {
     } else {
       responseType = BAD_REQUEST;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Details are required';
+      message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
