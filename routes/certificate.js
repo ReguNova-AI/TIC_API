@@ -25,7 +25,7 @@ router.get('/api/v1/certificates', async (req, res) => {
     let statusCode = '';
     let customResponse = {};
     user_id = parseInt(user_id);
-    if (req) {
+    if (user_id) {
       let res = await getCertificateService({ user_id });
       if (res) {
         responseType = SUCCESS;
