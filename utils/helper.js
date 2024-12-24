@@ -1,25 +1,61 @@
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 
-// const PASSWORD = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/;
+const validate = (
+  strArrObj = {},
+  emails = {},
+  numbers = {},
+  passwords = {},
+) => {
+  // Initialize errors object with default null values
+  const errors = {
+    strArrObj: {},
+    emails: {},
+    numbers: {},
+    passwords: {},
+  };
 
-// const validate = (strArrObj = {}, emails = {}, numbers = {}, passwords = {}) => {
-//   let validArray = [];
-//   Object.values(strArrObj).map((item) => {
-//     validArray.push(!_.isEmpty(item));
-//   });
-//   Object.values(emails).map((item) => {
-//     validArray.push(validator.isEmail(item));
-//   });
-//   Object.values(numbers).map((item) => {
-//     validArray.push(item > 0);
-//   });
-//   Object.values(passwords).map((item) => {
-//     validArray.push(item.match(PASSWORD));
-//   });
+  // Helper function to set an error message
+  const setError = (category, key, message) => {
+    if (!errors[category]) return;
+    errors[category][key] = message;
+  };
 
-//   return validArray.every(Boolean);
-// };
+  // Validate string array objects
+  Object.entries(strArrObj).forEach(([key, item]) => {
+    if (_.isEmpty(item.trim())) {
+      setError('strArrObj', key, `Field ${key} is empty`);
+    }
+  });
+
+  // Validate emails
+  Object.entries(emails).forEach(([key, item]) => {
+    if (!item.match(EMAIL)) {
+      setError('emails', key, `Field ${key} is not a valid email`);
+    }
+  });
+
+  // Validate numbers
+  Object.entries(numbers).forEach(([key, item]) => {
+    if (item <= 0) {
+      setError('numbers', key, `Field ${key} is not a valid number`);
+    }
+  });
+
+  // Validate passwords
+  Object.entries(passwords).forEach(([key, item]) => {
+    if (!item.match(PASSWORD)) {
+      setError('passwords', key, `Field ${key} is not a valid password`);
+    }
+  });
+
+  // Determine if all validations passed
+  const isValid = Object.values(errors).every((category) =>
+    Object.values(category).every((message) => !message),
+  );
+
+  return { isValid, errors };
+};
 
 const getOtp = () => {
   const number = Math.random().toString().slice(2, 8);
@@ -61,7 +97,7 @@ const generateRandomPassword = () => {
 };
 
 module.exports = {
-  // validate,
+  validate,
   getOtp,
   getToken,
   getRefreshToken,
