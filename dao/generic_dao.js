@@ -16,7 +16,9 @@ const genericQuery = async (queryType, params = {}) => {
       case 'CREATE_ORGANISATION':
         query1 = `INSERT INTO organizations (
                       sector_id,
+                      sector_name,
                       industries,
+                      industry_names,
                       org_name,
                       org_email,
                       org_logo,
@@ -25,7 +27,9 @@ const genericQuery = async (queryType, params = {}) => {
                       contact_json
                   ) VALUES (
                       ${params.sector_id},
+                      '${params.sector_name}'
                       '${params.industries}',
+                      '${params.industry_names}'
                       '${params.org_name}',
                       '${params.org_email}',
                       '${params.org_logo}',
