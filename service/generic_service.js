@@ -83,6 +83,20 @@ const getSingleSectorService = async (params) => {
   }
 };
 
+const createSectorService = async (params) => {
+  try {
+    let data = {};
+    const response = await genericQuery('CREATE_SECTOR', params);
+    let sector_id = response?.insertId ? response.insertId : 0;
+    if (sector_id) {
+      data = await genericQuery('GET_SINGLE_SECTOR', { sector_id });
+    }
+    return data;
+  } catch (error) {
+    logger.error('create sector service', error);
+  }
+};
+
 module.exports = {
   getOrgService,
   getSignleOrgService,
@@ -92,4 +106,5 @@ module.exports = {
   createIndustryService,
   getSectorsService,
   getSingleSectorService,
+  createSectorService,
 };

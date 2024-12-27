@@ -58,10 +58,19 @@ const genericQuery = async (queryType, params = {}) => {
         break;
       case 'GET_SECTORS':
         query1 = `SELECT * FROM sectors;`;
-        
         break;
       case 'GET_SINGLE_SECTOR':
         query1 = `SELECT * FROM sectors WHERE sector_id = ${params.sector_id};`;
+        break;
+      case 'CREATE_SECTOR':
+        query1 = `INSERT INTO sectors (
+                      sector_name, 
+                      sector_desc
+                  ) 
+                  VALUES (
+                      '${params.sector_name}', 
+                      '${params.sector_desc}'
+                  );`;
         break;
     }
 

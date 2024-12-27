@@ -20,6 +20,7 @@ const {
   createIndustryService,
   getSectorsService,
   getSingleSectorService,
+  createSectorService,
 } = require('../service/generic_service');
 
 router.get('/api/v1/organizations', async (req, res) => {
@@ -338,6 +339,47 @@ router.get('/api/v1/sectors/:sector_id', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('get single sector route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.post('/api/v1/sectors/create', async (req, res) => {
+  try {
+    const {
+      body: { sector_name = null, sector_desc = null },
+    } = req;
+    const { isValid, errors } = validate({ sector_name });
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    if (isValid) {
+      let res = await createSectorService(req.body);
+      if (res) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.details = res;
+        data.message = 'Created sector Successfully';
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'Failed to create sector';
+        customResponse.messageCode = statusCode;
+      }
+    } else {
+      responseType = BAD_REQUEST;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = 'Details are required';
+      message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('create sector route', err);
     res.status(500).send(err);
   }
 });
