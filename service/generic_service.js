@@ -51,6 +51,20 @@ const getSingleIndustryService = async (params) => {
   }
 };
 
+const createIndustryService = async (params) => {
+  try {
+    let data = {};
+    const response = await genericQuery('CREATE_INDUSTRY', params);
+    let industry_id = response?.insertId ? response.insertId : 0;
+    if (industry_id) {
+      data = await genericQuery('GET_SINGLE_INDUSTRY', { industry_id });
+    }
+    return data;
+  } catch (error) {
+    logger.error('create industry service', error);
+  }
+};
+
 const getSectorsService = async (params) => {
   try {
     const data = await genericQuery('GET_SECTORS', params);
@@ -75,6 +89,7 @@ module.exports = {
   createOrgService,
   getIndustryService,
   getSingleIndustryService,
+  createIndustryService,
   getSectorsService,
   getSingleSectorService,
 };
