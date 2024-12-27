@@ -101,14 +101,16 @@ router.post('/api/v1/organizations/create', async (req, res) => {
     const {
       body: {
         sector_id = null,
+        sector_name = null,
         industries = null,
+        industry_names = null,
         org_name = null,
         org_email = null,
         contact_json = null,
       },
     } = req;
     const { isValid, errors } = validate(
-      { org_name },
+      { org_name, sector_name },
       { org_email },
       { sector_id },
     );
