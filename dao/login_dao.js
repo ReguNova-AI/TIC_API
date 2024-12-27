@@ -28,15 +28,22 @@ const loginQuery = async (queryType, params = {}) => {
                     r.role_id,
                     r.role_name,
                     r.role_desc,
-                    r.permissions
+                    r.permissions,
+                    s.sector_id,
+                    s.sector_name,
+                    s.sector_desc
                 FROM 
                     users u
                 LEFT JOIN 
                     organizations o ON u.org_id = o.org_id
                 LEFT JOIN 
-                    roles r ON u.role_id = r.role_id 
+                    roles r ON u.role_id = r.role_id
+                LEFT JOIN 
+                    sectors s ON o.sector_id = s.sector_id
                 WHERE 
-                    u.user_email = '${params.email}' and u.user_password = '${params.password}';`;
+                    u.user_email = '${params.email}' 
+                    AND u.user_password = '${params.password}';
+                `;
         break;
       case 'UPDATE_USER_TOKEN':
         query1 = `UPDATE users SET token = '${params.tokenHash}' 
