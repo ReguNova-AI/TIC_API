@@ -27,9 +27,9 @@ const genericQuery = async (queryType, params = {}) => {
                       contact_json
                   ) VALUES (
                       ${params.sector_id},
-                      '${params.sector_name}'
+                      '${params.sector_name}',
                       '${params.industries}',
-                      '${params.industry_names}'
+                      '${params.industry_names}',
                       '${params.org_name}',
                       '${params.org_email}',
                       '${params.org_logo}',
