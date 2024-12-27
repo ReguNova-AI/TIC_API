@@ -19,6 +19,20 @@ const getSignleOrgService = async (params) => {
   }
 };
 
+const createOrgService = async (params) => {
+  try {
+    let data = {};
+    const response = await genericQuery('CREATE_ORGANISATION', params);
+    let org_id = response?.insertId ? response.insertId : 0;
+    if (org_id) {
+      data = await genericQuery('GET_SINGLE_ORGANIZATIONS', { org_id });
+    }
+    return data;
+  } catch (error) {
+    logger.error('create org service', error);
+  }
+};
+
 const getIndustryService = async (params) => {
   try {
     const data = await genericQuery('GET_INDUSTRIES', params);
@@ -37,29 +51,30 @@ const getSingleIndustryService = async (params) => {
   }
 };
 
-  const getSectorsService = async (params) => {
-    try {
-      const data = await genericQuery('GET_SECTORS', params);
-      return data;
-    } catch (error) {
-      logger.error('get sectors service', error);
-    }
-  };
+const getSectorsService = async (params) => {
+  try {
+    const data = await genericQuery('GET_SECTORS', params);
+    return data;
+  } catch (error) {
+    logger.error('get sectors service', error);
+  }
+};
 
-  const getSingleSectorService = async (params) => {
-    try {
-      const data = await genericQuery('GET_SINGLE_SECTOR', params);
-      return data;
-    } catch (error) {
-      logger.error('get single sector service', error);
-    }
-  };
+const getSingleSectorService = async (params) => {
+  try {
+    const data = await genericQuery('GET_SINGLE_SECTOR', params);
+    return data;
+  } catch (error) {
+    logger.error('get single sector service', error);
+  }
+};
 
-  module.exports = {
-    getOrgService,
-    getSignleOrgService,
-    getIndustryService,
-    getSingleIndustryService,
-    getSectorsService,
-    getSingleSectorService,
-  };
+module.exports = {
+  getOrgService,
+  getSignleOrgService,
+  createOrgService,
+  getIndustryService,
+  getSingleIndustryService,
+  getSectorsService,
+  getSingleSectorService,
+};
