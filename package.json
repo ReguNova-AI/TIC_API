@@ -20,6 +20,7 @@
     "express": "^4.21.1",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
     "logger": "^0.0.1",
     "mysql2": "^3.11.4",
     "nodemailer": "^6.9.16",
