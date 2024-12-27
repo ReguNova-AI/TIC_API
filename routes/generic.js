@@ -17,6 +17,7 @@ const {
   createOrgService,
   getIndustryService,
   getSingleIndustryService,
+  createIndustryService,
   getSectorsService,
   getSingleSectorService,
 } = require('../service/generic_service');
@@ -214,6 +215,56 @@ router.get('/api/v1/industries/:industry_id', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('get single industry route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.post('/api/v1/industries/create', async (req, res) => {
+  try {
+    const {
+      body: {
+        industry_name = null,
+        industry_description = null,
+        sector_id = null,
+        sector_name = null,
+      },
+    } = req;
+    const { isValid, errors } = validate(
+      { industry_name, industry_description, sector_name },
+      {},
+      { sector_id },
+    );
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    if (isValid) {
+      let res = await createIndustryService(req.body);
+      if (res) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.details = res;
+        data.message = 'Created industry Successfully';
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'Failed to create industry';
+        customResponse.messageCode = statusCode;
+      }
+    } else {
+      responseType = BAD_REQUEST;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = 'Details are required';
+      message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('create industry route', err);
     res.status(500).send(err);
   }
 });
