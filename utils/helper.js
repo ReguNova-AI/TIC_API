@@ -1,5 +1,7 @@
+const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const { EMAIL, PASSWORD } = require('../constants/constants');
 
 const validate = (
   strArrObj = {},
