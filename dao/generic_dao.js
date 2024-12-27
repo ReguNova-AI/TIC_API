@@ -13,6 +13,28 @@ const genericQuery = async (queryType, params = {}) => {
       case 'GET_SINGLE_ORGANIZATIONS':
         query1 = `SELECT * FROM organizations WHERE org_id = ${params.org_id};`;
         break;
+      case 'CREATE_ORGANISATION':
+        query1 = `INSERT INTO organizations (
+                      sector_id,
+                      industries,
+                      org_name,
+                      org_email,
+                      org_logo,
+                      org_url,
+                      org_address,
+                      contact_json
+                  ) VALUES (
+                      ${params.sector_id},
+                      '${params.industries}',
+                      '${params.org_name}',
+                      '${params.org_email}',
+                      '${params.org_logo}',
+                      '${params.org_url}',
+                      '${JSON.stringify(params.org_address)}',
+                      '${JSON.stringify(params.contact_json)}'
+                  );
+                `;
+        break;
       case 'GET_INDUSTRIES':
         query1 = `SELECT * FROM industries;`;
         break;

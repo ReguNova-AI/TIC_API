@@ -1,6 +1,7 @@
 const express = require('express');
 const router = new express.Router();
 const { setResponse } = require('../utils/response');
+const { validate } = require('../utils/helper');
 
 const {
   SUCCESS,
@@ -13,6 +14,7 @@ const { logger } = require('../utils/logger');
 const {
   getOrgService,
   getSignleOrgService,
+  createOrgService,
   getIndustryService,
   getSingleIndustryService,
   getSectorsService,
@@ -88,6 +90,57 @@ router.get('/api/v1/organizations/:org_id', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('get single organization route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.post('/api/v1/organizations/create', async (req, res) => {
+  try {
+    const {
+      body: {
+        sector_id = null,
+        industries = null,
+        org_name = null,
+        org_email = null,
+        contact_json = null,
+      },
+    } = req;
+    const { isValid, errors } = validate(
+      { org_name },
+      { org_email },
+      { sector_id },
+    );
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    if (isValid) {
+      let res = await createOrgService(req.body);
+      if (res) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.details = res;
+        data.message = 'Created Organization Successfully';
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'Failed to create Organization';
+        customResponse.messageCode = statusCode;
+      }
+    } else {
+      responseType = BAD_REQUEST;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = 'Details are required';
+      message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('create organization route', err);
     res.status(500).send(err);
   }
 });
