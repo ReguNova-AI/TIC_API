@@ -97,6 +97,18 @@ const createSectorService = async (params) => {
   }
 };
 
+const getOrgDetailsExistService = async (params) => {
+  try {
+    const [{ org_id = null } = {}] = await genericQuery(
+      'CHECK_IF_ORG_DETAILS_EXIST',
+      params,
+    );
+    return org_id;
+  } catch (error) {
+    logger.error('get org details exist service', error);
+  }
+};
+
 module.exports = {
   getOrgService,
   getSignleOrgService,
@@ -107,4 +119,5 @@ module.exports = {
   getSectorsService,
   getSingleSectorService,
   createSectorService,
+  getOrgDetailsExistService,
 };
