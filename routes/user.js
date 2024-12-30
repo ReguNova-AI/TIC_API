@@ -88,11 +88,9 @@ router.get('/api/v1/users/exist', async (req, res) => {
         statusCode = STATUS_CODE_SUCCESS;
         data.message = 'User exist';
       } else {
-        responseType = CUSTOM_RESPONSE;
-        statusCode = STATUS_CODE_BAD_REQUEST;
-        customResponse.statusCode = statusCode;
-        customResponse.message = 'User not exist';
-        customResponse.messageCode = statusCode;
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.message = 'User not exist';
       }
     } else {
       responseType = BAD_REQUEST;
