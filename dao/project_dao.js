@@ -8,11 +8,26 @@ const projectQuery = async (queryType, params = {}) => {
     let query1 = '';
     switch (queryType) {
       case 'GET_PROJECTS':
-        query1 = `SELECT * FROM projects;`;
+        query1 = `SELECT * 
+                  FROM projects
+                  ORDER BY 
+                      CASE 
+                          WHEN status = 'Draft' THEN 1 
+                          ELSE 2 
+                      END, 
+                      last_run DESC;
+                `;
         break;
       case 'GET_SINGLE_PROJECT':
         query1 = `SELECT * FROM projects 
-                  WHERE project_id = ${params.project_id};`;
+                  WHERE project_id = ${params.project_id} 
+                  ORDER BY 
+                      CASE 
+                          WHEN status = 'Draft' THEN 1 
+                          ELSE 2 
+                      END, 
+                      last_run DESC;
+                  `;
         break;
       case 'CREATE_PROJECT':
         query1 = `INSERT INTO projects (
