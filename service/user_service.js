@@ -1,6 +1,7 @@
 const { logger } = require('../utils/logger');
 const { userQuery } = require('../dao/user_dao');
 const { generateRandomPassword } = require('../utils/helper');
+const { loginQuery } = require('../dao/login_dao');
 
 const insertUserService = async (params) => {
   try {
@@ -48,8 +49,25 @@ const getSignleUserService = async (params) => {
   }
 };
 
+const getUserExistService = async (params) => {
+  try {
+    try {
+      const [{ user_id = null } = {}] = await loginQuery(
+        'CHECK_IF_USER_EXISTS',
+        params,
+      );
+      return user_id;
+    } catch (error) {
+      logger.error('get single user service', error);
+    }
+  } catch (error) {
+    logger.error('get user exist service', error);
+  }
+};
+
 module.exports = {
   insertUserService,
   getUserService,
   getSignleUserService,
+  getUserExistService,
 };

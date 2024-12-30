@@ -1,6 +1,7 @@
 const express = require('express');
 const router = new express.Router();
 const { setResponse } = require('../utils/response');
+const { validate } = require('../utils/helper');
 
 const {
   SUCCESS,
@@ -16,6 +17,7 @@ const {
   insertUserService,
   getUserService,
   getSignleUserService,
+  getUserExistService,
 } = require('../service/user_service');
 
 router.post('/api/v1/user/create', async (req, res) => {
@@ -65,6 +67,46 @@ router.post('/api/v1/user/create', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('Project create route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.get('/api/v1/users/exist', async (req, res) => {
+  try {
+    let {
+      query: { email = null },
+    } = req;
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    const { isValid, errors } = validate({}, { email });
+    if (isValid) {
+      let res = await getUserExistService({ email });
+      if (res) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.message = 'User exist';
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'User not exist';
+        customResponse.messageCode = statusCode;
+      }
+    } else {
+      responseType = BAD_REQUEST;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = 'Details are required';
+      message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('get user exist route', err);
     res.status(500).send(err);
   }
 });
