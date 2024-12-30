@@ -21,7 +21,47 @@ const {
   getSectorsService,
   getSingleSectorService,
   createSectorService,
+  getOrgDetailsExistService,
 } = require('../service/generic_service');
+
+router.get('/api/v1/organizations/exist', async (req, res) => {
+  try {
+    let {
+      query: { org_name = null, org_email = null },
+    } = req;
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    const { isValid, errors } = validate({ org_name }, { org_email }, {});
+    if (isValid) {
+      let org_id = await getOrgDetailsExistService(req.query);
+      if (org_id) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.message =
+          'Organization name and email are already exists, please try again.';
+      } else {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.message = 'Organization name and email are not exists';
+      }
+    } else {
+      responseType = BAD_REQUEST;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = 'Details are required';
+      message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('get organization exist route', err);
+    res.status(500).send(err);
+  }
+});
 
 router.get('/api/v1/organizations', async (req, res) => {
   try {
