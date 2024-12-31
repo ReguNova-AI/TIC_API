@@ -98,6 +98,17 @@ const projectQuery = async (queryType, params = {}) => {
       case 'DELETE_PROJECT':
         query1 = ``;
         break;
+      case 'GET_PROJECT_COUNTS':
+        query1 = `SELECT
+                      COUNT(*) AS total_projects_count,
+                      SUM(CASE WHEN status = 'Draft' THEN 1 ELSE 0 END) AS draft_count,
+                      SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) AS in_progress_count,
+                      SUM(CASE WHEN status = 'Success' THEN 1 ELSE 0 END) AS success_count,
+                      SUM(CASE WHEN status = 'Failed' THEN 1 ELSE 0 END) AS failed_count
+                  FROM projects 
+                  WHERE 
+                    created_by_id = ${params.user_id};`;
+        break;
     }
 
     return new Promise((resolve, reject) => {

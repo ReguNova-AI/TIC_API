@@ -48,9 +48,19 @@ const projectUpdateService = async (params) => {
   }
 };
 
+const getProjectCountService = async (params) => {
+  try {
+    const data = await projectQuery('GET_PROJECT_COUNTS', params);
+    return data;
+  } catch (error) {
+    logger.error('Get project count service', error);
+  }
+};
+
 module.exports = {
   projectService,
   getProjectService,
   getSingleProjectService,
   projectUpdateService,
+  getProjectCountService,
 };
