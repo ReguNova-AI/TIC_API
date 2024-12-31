@@ -21,7 +21,7 @@ router.post('/api/v1/uploadToS3', async (req, res) => {
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (documents) {
+    if (documents && documents.length > 0) {
       let res = await uploadFileToS3(documents);
       if (res) {
         responseType = SUCCESS;
@@ -38,7 +38,7 @@ router.post('/api/v1/uploadToS3', async (req, res) => {
     } else {
       responseType = BAD_REQUEST;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Details are required';
+      customResponse.message = 'Document not found';
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
@@ -57,7 +57,7 @@ router.get('/api/v1/getFromS3', async (req, res) => {
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (imageKeys.length > 0) {
+    if (imageKeys && imageKeys.length > 0) {
       let res = await getFileFromS3(imageKeys);
       if (res) {
         responseType = SUCCESS;
@@ -74,7 +74,7 @@ router.get('/api/v1/getFromS3', async (req, res) => {
     } else {
       responseType = BAD_REQUEST;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Details are required';
+      customResponse.message = 'Image key not found';
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
