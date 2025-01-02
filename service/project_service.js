@@ -16,9 +16,9 @@ const projectService = async (params) => {
   }
 };
 
-const getProjectService = async (params) => {
+const getProjectService = async () => {
   try {
-    const data = await projectQuery('GET_PROJECTS', params);
+    const data = await projectQuery('GET_PROJECTS');
     return data;
   } catch (error) {
     logger.error('Project service', error);
