@@ -30,10 +30,12 @@ const loginService = async (email, password) => {
     const userDetails =
       (await loginQuery('GET_USER_DETAILS', loginParams)) || [];
     const user_id = userDetails[0].user_id;
+    const org_id = userDetails[0].org_id ? userDetails[0].org_id : 0;
     if (Array.isArray(userDetails) && userDetails.length > 0) {
       let data = {
         email,
         user_id,
+        org_id,
       };
 
       // what and all we have to consider for generating the tokens

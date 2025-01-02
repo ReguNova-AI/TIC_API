@@ -16,11 +16,12 @@ const authenticate = async (bearerToken) => {
           data.isExpired = true;
         }
       } else {
-        const { email = null, user_id = null } = decode;
+        const { email = null, user_id = null, org_id = null } = decode;
         data.isValid = true;
         data.details = {
           email,
           user_id,
+          org_id,
         };
       }
     });
