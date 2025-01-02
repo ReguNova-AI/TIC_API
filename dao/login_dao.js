@@ -31,7 +31,10 @@ const loginQuery = async (queryType, params = {}) => {
                     r.permissions,
                     s.sector_id,
                     s.sector_name,
-                    s.sector_desc
+                    s.sector_desc,
+                    i.industry_id,
+                    i.industry_name,
+                    i.industry_desc
                 FROM 
                     users u
                 LEFT JOIN 
@@ -40,6 +43,8 @@ const loginQuery = async (queryType, params = {}) => {
                     roles r ON u.role_id = r.role_id
                 LEFT JOIN 
                     sectors s ON o.sector_id = s.sector_id
+                LEFT JOIN 
+                    industries i ON u.industry_id = i.industry_id
                 WHERE 
                     u.user_email = '${params.email}' 
                     AND u.user_password = '${params.password}';
