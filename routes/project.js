@@ -86,11 +86,11 @@ router.get('/api/v1/projects', async (req, res) => {
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    let res = await getProjectService();
-    if (res) {
+    let details = await getProjectService();
+    if (details) {
       responseType = SUCCESS;
       statusCode = STATUS_CODE_SUCCESS;
-      data.details = res;
+      data.details = details;
       data.message = 'Fetched Details Successfully';
     } else {
       responseType = CUSTOM_RESPONSE;
@@ -118,11 +118,11 @@ router.get('/api/v1/projects/counts', async (req, res) => {
     let customResponse = {};
     const { isValid, errors } = validate({}, {}, { user_id });
     if (isValid) {
-      let res = await getProjectCountService(req.query);
-      if (res) {
+      let details = await getProjectCountService(req.query);
+      if (details) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
-        data.details = res[0];
+        data.details = details[0];
         data.message = 'Fetched Details Successfully';
       } else {
         responseType = CUSTOM_RESPONSE;
@@ -158,11 +158,11 @@ router.get('/api/v1/projects/:project_id', async (req, res) => {
     let statusCode = '';
     let customResponse = {};
     if (project_id) {
-      let res = await getSingleProjectService({ project_id });
-      if (res) {
+      let details = await getSingleProjectService({ project_id });
+      if (details) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
-        data.details = res;
+        data.details = details;
         data.message = 'Fetched Details Successfully';
       } else {
         responseType = CUSTOM_RESPONSE;
