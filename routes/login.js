@@ -28,6 +28,7 @@ const {
   LOGOUT_SUCCESS,
 } = require('../constants/response_constants');
 const { logger } = require('../utils/logger');
+const { validate } = require('../utils/helper');
 
 router.post('/api/v1/login', async (req, res) => {
   try {
@@ -39,7 +40,8 @@ router.post('/api/v1/login', async (req, res) => {
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (email && password) {
+    const { isValid, errors } = validate({}, { email }, {}, { password });
+    if (isValid) {
       // validations for email and password
       const { token, refreshToken, userDetails, user_id, message } =
         await loginService(email, password);
@@ -58,10 +60,12 @@ router.post('/api/v1/login', async (req, res) => {
         customResponse.messageCode = STATUS_CODE_INTERNAL_SERVER_ERROR;
       }
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.statusCode = statusCode;
-      customResponse.message = INVALID_DETAILS;
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
     }
     let response = setResponse(
       responseType,
@@ -85,10 +89,9 @@ router.post('/api/v1/forgotPassword/sendOtp', async (req, res) => {
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (email) {
-      let resetPasswordParams = { email };
-      let { isEmailSent, userId } =
-        await forgotPasswordService(resetPasswordParams);
+    const { isValid, errors } = validate({}, { email });
+    if (isValid) {
+      let { isEmailSent, userId } = await forgotPasswordService(req.body);
       if (isEmailSent && userId) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
@@ -101,9 +104,12 @@ router.post('/api/v1/forgotPassword/sendOtp', async (req, res) => {
         customResponse.messageCode = statusCode;
       }
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Email is required';
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
@@ -124,7 +130,8 @@ router.post('/api/v1/forgotPassword/verifyOtp', async (req, res) => {
     let statusCode = '';
     let customResponse = {};
 
-    if (email && otp) {
+    const { isValid, errors } = validate({ otp }, { email });
+    if (isValid) {
       const { isOtpValid } = await verifyOtpService({ email, otp });
 
       if (isOtpValid) {
@@ -139,10 +146,12 @@ router.post('/api/v1/forgotPassword/verifyOtp', async (req, res) => {
         customResponse.messageCode = STATUS_CODE_UNAUTHORIZED;
       }
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Email and OTP are required';
-      customResponse.messageCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
     }
 
     let response = setResponse(responseType, '', data, customResponse);
@@ -162,7 +171,8 @@ router.post('/api/v1/resetPassword', async (req, res) => {
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (email && password) {
+    const { isValid, errors } = validate({}, { email }, {}, { password });
+    if (isValid) {
       let resetPasswordParams = { email, password };
       const isPasswordUpdated = await resetPasswordService(resetPasswordParams);
       if (isPasswordUpdated) {
@@ -176,8 +186,12 @@ router.post('/api/v1/resetPassword', async (req, res) => {
         customResponse.messageCode = STATUS_CODE_INVALID_SUCCESS;
       }
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
     }
     let response = setResponse(
       responseType,
@@ -201,7 +215,8 @@ router.get('/api/v1/refreshToken', async (req, res) => {
     let statusCode = '';
     let customResponse = {};
     let data = {};
-    if (refreshToken) {
+    const { isValid, errors } = validate({ refreshToken });
+    if (isValid) {
       const {
         isRefreshValid = false,
         isRefreshExpired = false,
@@ -227,8 +242,12 @@ router.get('/api/v1/refreshToken', async (req, res) => {
         customResponse.messageCode = STATUS_CODE_INVALID_SUCCESS;
       }
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
     }
     let response = setResponse(
       responseType,
@@ -246,13 +265,14 @@ router.get('/api/v1/refreshToken', async (req, res) => {
 router.post('/api/v1/logout', async (req, res) => {
   try {
     const {
-      body: { user_id = null },
+      query: { user_id = null },
     } = req;
     let data = {};
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (user_id) {
+    const { isValid, errors } = validate({}, {}, { user_id });
+    if (isValid) {
       const isLoggedOut = await logoutService({ user_id });
       if (isLoggedOut) {
         responseType = SUCCESS;
@@ -266,10 +286,12 @@ router.post('/api/v1/logout', async (req, res) => {
         customResponse.messageCode = STATUS_CODE_INTERNAL_SERVER_ERROR;
       }
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.statusCode = statusCode;
-      customResponse.message = INVALID_DETAILS;
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
     }
     let response = setResponse(
       responseType,
