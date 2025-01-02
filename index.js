@@ -68,7 +68,7 @@ app.use(async (req, res, next) => {
     if (isExpired) {
       res.status(401).send({ error: 'Token Expired' });
     } else if (isValid) {
-      req.body.userDetails = details;
+      req.query.user_id = details.user_id;
       res.on('finish', function () {
         const endTime = new Date();
         const totalTime = endTime - start + 'ms';
