@@ -138,12 +138,11 @@ router.get('/api/v1/users', async (req, res) => {
   }
 });
 
-router.get('/api/v1/single/user', async (req, res) => {
+router.get('/api/v1/users/:user_id', async (req, res) => {
   try {
     let {
-      query: { user_id = null },
+      params: { user_id = null },
     } = req;
-    user_id = parseInt(user_id);
     let data = {};
     let responseType = '';
     let statusCode = '';
@@ -179,7 +178,7 @@ router.get('/api/v1/single/user', async (req, res) => {
   }
 });
 
-router.get('/api/v1/oa/users', async (req, res) => {
+router.get('/api/v1/org/users', async (req, res) => {
   try {
     let {
       query: { industry_id = null, org_id = null },
