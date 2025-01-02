@@ -33,8 +33,7 @@ const loginQuery = async (queryType, params = {}) => {
                     s.sector_name,
                     s.sector_desc,
                     i.industry_id,
-                    i.industry_name,
-                    i.industry_desc
+                    i.industry_name
                 FROM 
                     users u
                 LEFT JOIN 
