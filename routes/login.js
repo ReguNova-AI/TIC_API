@@ -265,7 +265,7 @@ router.get('/api/v1/refreshToken', async (req, res) => {
 router.post('/api/v1/logout', async (req, res) => {
   try {
     const {
-      query: { user_id = null },
+      body: { user_id = null },
     } = req;
     let data = {};
     let responseType = '';
