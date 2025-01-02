@@ -40,8 +40,8 @@ router.post('/api/v1/login', async (req, res) => {
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    const { isValid, errors } = validate({}, { email }, {}, { password });
-    if (isValid) {
+    const { isValid, errors } = validate({}, { email });
+    if (isValid && password && password.length > 0) {
       // validations for email and password
       const { token, refreshToken, userDetails, user_id, message } =
         await loginService(email, password);
