@@ -29,22 +29,18 @@ router.post('/api/v1/user/create', async (req, res) => {
       user_last_name,
       user_email,
       user_phone_no,
-      user_password,
       created_by,
     } = req.body;
     let data = {};
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (
-      org_id &&
-      role_id &&
-      user_first_name &&
-      user_last_name &&
-      user_email &&
-      user_phone_no &&
-      created_by
-    ) {
+    const { isValid, errors } = validate(
+      { user_first_name, user_last_name, user_phone_no },
+      { user_email },
+      { org_id, role_id, created_by },
+    );
+    if (isValid) {
       let res = await insertUserService(req.body);
       if (res) {
         responseType = SUCCESS;
@@ -59,9 +55,12 @@ router.post('/api/v1/user/create', async (req, res) => {
         customResponse.messageCode = statusCode;
       }
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Details are required';
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
@@ -93,10 +92,9 @@ router.get('/api/v1/users/exist', async (req, res) => {
         data.message = 'User not exist';
       }
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Details are required';
-      message = Object.values(errors)
+      customResponse.message = Object.values(errors)
         .flatMap((err) => Object.values(err))
         .filter((msg) => msg)
         .join(', ');
@@ -118,24 +116,18 @@ router.get('/api/v1/users', async (req, res) => {
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (req.body) {
-      let res = await getUserService(req.body);
-      if (res) {
-        responseType = SUCCESS;
-        statusCode = STATUS_CODE_SUCCESS;
-        data.details = res;
-        data.message = 'Fetched Details Successfully';
-      } else {
-        responseType = CUSTOM_RESPONSE;
-        statusCode = STATUS_CODE_BAD_REQUEST;
-        customResponse.statusCode = statusCode;
-        customResponse.message = 'Failed to get response';
-        customResponse.messageCode = statusCode;
-      }
+    let details = await getUserService();
+    if (details) {
+      responseType = SUCCESS;
+      statusCode = STATUS_CODE_SUCCESS;
+      data.details = details;
+      data.message = 'Fetched Details Successfully';
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Details are required';
+      customResponse.statusCode = statusCode;
+      customResponse.message = 'Failed to get response';
+      customResponse.messageCode = statusCode;
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
@@ -145,18 +137,19 @@ router.get('/api/v1/users', async (req, res) => {
   }
 });
 
-router.get('/api/v1/users/:user_id', async (req, res) => {
+router.get('/api/v1/single/user', async (req, res) => {
   try {
     let {
-      params: { user_id = null },
+      query: { user_id = null },
     } = req;
     user_id = parseInt(user_id);
     let data = {};
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (user_id) {
-      let res = await getSignleUserService({ user_id });
+    const { isValid, errors } = validate({}, {}, { user_id });
+    if (isValid) {
+      let res = await getSignleUserService(req.query);
       if (res) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
@@ -170,9 +163,12 @@ router.get('/api/v1/users/:user_id', async (req, res) => {
         customResponse.messageCode = statusCode;
       }
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Details are required';
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
