@@ -10,6 +10,9 @@ const userQuery = async (queryType, params = {}) => {
       case 'GET_USERS':
         query1 = `SELECT * FROM users;`;
         break;
+      case 'GET_ORG_USERS':
+        query1 = `SELECT * FROM users WHERE org_id = ${params.org_id} ${params.industry_id ? ` AND ${params.industry_id}` : ''}`;
+        break;
       case 'GET_SINGLE_USER':
         query1 = `SELECT * FROM users WHERE user_id = ${params.user_id};`;
         break;

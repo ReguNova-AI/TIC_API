@@ -31,9 +31,9 @@ const insertUserService = async (params) => {
   }
 };
 
-const getUserService = async (params) => {
+const getUserService = async () => {
   try {
-    const data = await userQuery('GET_USERS', params);
+    const data = await userQuery('GET_USERS');
     return data;
   } catch (error) {
     logger.error('get user service', error);
@@ -65,9 +65,19 @@ const getUserExistService = async (params) => {
   }
 };
 
+const getOrgUserService = async (params) => {
+  try {
+    const data = await userQuery('GET_ORG_USERS', params);
+    return data;
+  } catch (error) {
+    logger.error('get org user service', error);
+  }
+};
+
 module.exports = {
   insertUserService,
   getUserService,
   getSignleUserService,
   getUserExistService,
+  getOrgUserService,
 };
