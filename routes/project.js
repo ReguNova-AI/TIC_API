@@ -18,6 +18,7 @@ const {
   getSingleProjectService,
   projectUpdateService,
   getProjectCountService,
+  getUserProjectService,
 } = require('../service/project_service');
 
 router.post('/api/v1/project/create', async (req, res) => {
@@ -48,12 +49,13 @@ router.post('/api/v1/project/create', async (req, res) => {
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (
-      project_name &&
-      project_no &&
-      project_description &&
-      regulatory_standard
-    ) {
+    const { isValid, errors } = validate({
+      project_name,
+      project_no,
+      project_description,
+      regulatory_standard,
+    });
+    if (isValid) {
       let response = await projectService(req.body);
       if (response) {
         responseType = SUCCESS;
@@ -68,9 +70,12 @@ router.post('/api/v1/project/create', async (req, res) => {
         customResponse.messageCode = statusCode;
       }
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Details are required';
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
@@ -152,12 +157,13 @@ router.get('/api/v1/projects/:project_id', async (req, res) => {
     let {
       params: { project_id = null },
     } = req;
-    project_id = parseInt(project_id);
+    // project_id = parseInt(project_id);
     let data = {};
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (project_id) {
+    const { isValid, errors } = validate({}, {}, { project_id });
+    if (isValid) {
       let details = await getSingleProjectService({ project_id });
       if (details) {
         responseType = SUCCESS;
@@ -172,9 +178,12 @@ router.get('/api/v1/projects/:project_id', async (req, res) => {
         customResponse.messageCode = statusCode;
       }
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Details are required';
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
@@ -199,13 +208,12 @@ router.put('/api/v1/project/update', async (req, res) => {
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (
-      project_name &&
-      project_no &&
-      project_description &&
-      regulatory_standard &&
-      project_id
-    ) {
+    const { isValid, errors } = validate(
+      { project_name, project_no, project_description, regulatory_standard },
+      {},
+      { project_id },
+    );
+    if (isValid) {
       let response = await projectUpdateService(req.body);
       if (response) {
         responseType = SUCCESS;
@@ -220,14 +228,58 @@ router.put('/api/v1/project/update', async (req, res) => {
         customResponse.messageCode = statusCode;
       }
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Details are required';
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('Project update route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.get('/api/v1/org/projects', async (req, res) => {
+  try {
+    let {
+      query: { industry_id = null, org_id = null },
+    } = req;
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    industry_id = parseInt(industry_id);
+    const { isValid, errors } = validate({}, {}, { org_id });
+    if (isValid) {
+      let details = await getUserProjectService(req.query);
+      if (details) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.details = details;
+        data.message = 'Fetched Details Successfully';
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'Failed to get response';
+        customResponse.messageCode = statusCode;
+      }
+    } else {
+      responseType = CUSTOM_RESPONSE;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('Get user Project details route', err);
     res.status(500).send(err);
   }
 });
