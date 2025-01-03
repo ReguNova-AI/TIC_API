@@ -81,10 +81,10 @@ app.use(async (req, res, next) => {
       });
       next();
     } else {
-      res.sendStatus(403);
+      res.status(403).send('You no longer have permission to access this page.');
     }
   } else {
-    res.sendStatus(403);
+    res.send(403).send('Authentication failed');
   }
 });
 
