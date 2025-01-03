@@ -11,14 +11,11 @@ const {
 } = require('../service/login_service');
 const {
   SUCCESS,
-  BAD_REQUEST,
   STATUS_CODE_SUCCESS,
   STATUS_CODE_BAD_REQUEST,
   LOGIN_SUCCESS,
-  USER_NOT_FOUND,
   STATUS_CODE_INVALID_SUCCESS,
   STATUS_CODE_INTERNAL_SERVER_ERROR,
-  INVALID_DETAILS,
   CUSTOM_RESPONSE,
   RESET_PASSWORD_SUCCESS,
   STATUS_CODE_UNAUTHORISED,
@@ -140,10 +137,10 @@ router.post('/api/v1/forgotPassword/verifyOtp', async (req, res) => {
         data.message = 'OTP verified successfully';
       } else {
         responseType = CUSTOM_RESPONSE;
-        statusCode = STATUS_CODE_UNAUTHORIZED;
+        statusCode = STATUS_CODE_UNAUTHORISED;
         customResponse.statusCode = statusCode;
-        customResponse.message = 'Invalid or expired OTP';
-        customResponse.messageCode = STATUS_CODE_UNAUTHORIZED;
+        customResponse.message = 'Invalid OTP';
+        customResponse.messageCode = STATUS_CODE_UNAUTHORISED;
       }
     } else {
       responseType = CUSTOM_RESPONSE;
