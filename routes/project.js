@@ -18,7 +18,8 @@ const {
   getSingleProjectService,
   projectUpdateService,
   getProjectCountService,
-  getUserProjectService,
+  getOrgProjectService,
+  getUserCreatedProjectService,
 } = require('../service/project_service');
 
 router.post('/api/v1/project/create', async (req, res) => {
@@ -255,7 +256,7 @@ router.get('/api/v1/org/projects', async (req, res) => {
     industry_id = parseInt(industry_id);
     const { isValid, errors } = validate({}, {}, { org_id });
     if (isValid) {
-      let details = await getUserProjectService(req.query);
+      let details = await getOrgProjectService(req.query);
       if (details) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
@@ -279,9 +280,48 @@ router.get('/api/v1/org/projects', async (req, res) => {
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
   } catch (err) {
-    logger.error('Get user Project details route', err);
+    logger.error('Get org project details route', err);
     res.status(500).send(err);
   }
 });
 
+router.get('/api/v1/user/projects', async (req, res) => {
+  try {
+    let {
+      query: { user_id = null },
+    } = req;
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    const { isValid, errors } = validate({}, {}, { user_id });
+    if (isValid) {
+      let details = await getUserCreatedProjectService(req.query);
+      if (details) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.details = details;
+        data.message = 'Fetched Details Successfully';
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'Failed to get response';
+        customResponse.messageCode = statusCode;
+      }
+    } else {
+      responseType = CUSTOM_RESPONSE;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('Get user created project route', err);
+    res.status(500).send(err);
+  }
+});
 module.exports = router;
