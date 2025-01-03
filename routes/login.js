@@ -139,7 +139,7 @@ router.post('/api/v1/forgotPassword/verifyOtp', async (req, res) => {
         responseType = CUSTOM_RESPONSE;
         statusCode = STATUS_CODE_UNAUTHORISED;
         customResponse.statusCode = statusCode;
-        customResponse.message = 'Invalid or expired OTP';
+        customResponse.message = 'Invalid OTP';
         customResponse.messageCode = STATUS_CODE_UNAUTHORISED;
       }
     } else {
