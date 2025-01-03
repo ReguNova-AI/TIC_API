@@ -18,7 +18,19 @@ const projectQuery = async (queryType, params = {}) => {
                       last_run DESC;
                 `;
         break;
-      case 'GET_USER_PROJECTS':
+      case 'GET_USER_CREATED_PROJECTS':
+        query1 = `SELECT * 
+                  FROM projects
+                  WHERE created_by_id = ${params.user_id} 
+                  ORDER BY 
+                      CASE 
+                          WHEN status = 'Draft' THEN 1 
+                          ELSE 2 
+                      END, 
+                      last_run DESC;
+                `;
+        break;
+      case 'GET_ORG_PROJECTS':
         query1 = `SELECT * 
                   FROM projects
                   WHERE org_id = ${params.org_id}
