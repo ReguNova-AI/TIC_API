@@ -138,17 +138,15 @@ router.get('/api/v1/organizations/:org_id', async (req, res) => {
 
 router.post('/api/v1/organizations/create', async (req, res) => {
   try {
-    const {
+    let {
       body: {
         sector_id = null,
         sector_name = null,
-        industries = null,
-        industry_names = null,
         org_name = null,
         org_email = null,
-        contact_json = null,
       },
     } = req;
+    req.body.user_id = req.query.user_id;
     const { isValid, errors } = validate(
       { org_name, sector_name },
       { org_email },

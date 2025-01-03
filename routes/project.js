@@ -54,7 +54,6 @@ router.post('/api/v1/project/create', async (req, res) => {
       project_name,
       project_no,
       project_description,
-      regulatory_standard,
     });
     if (isValid) {
       let response = await projectService(req.body);

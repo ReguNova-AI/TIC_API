@@ -79,6 +79,9 @@ const genericQuery = async (queryType, params = {}) => {
       case 'CHECK_IF_ORG_DETAILS_EXIST':
         query1 = `SELECT org_id FROM organizations WHERE org_name = '${params.org_name}' AND org_email = '${params.org_email}';`;
         break;
+      case 'GET_ROLE_ID_BY_NAME':
+        query1 = `SELECT role_id FROM roles WHERE role_name = '${params.role_name}'`;
+        break;
     }
 
     return new Promise((resolve, reject) => {
