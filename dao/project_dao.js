@@ -147,6 +147,15 @@ const projectQuery = async (queryType, params = {}) => {
                     org_id = ${params.org_id} 
                     ${params.industry_id ? ` AND industry_id = ${params.industry_id}` : ''};`;
         break;
+      case 'GET_SA_PROJECT_COUNTS':
+        query1 = `SELECT
+                      COUNT(*) AS total_projects_count,
+                      SUM(CASE WHEN status = 'Draft' THEN 1 ELSE 0 END) AS draft_count,
+                      SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) AS in_progress_count,
+                      SUM(CASE WHEN status = 'Success' THEN 1 ELSE 0 END) AS success_count,
+                      SUM(CASE WHEN status = 'Failed' THEN 1 ELSE 0 END) AS failed_count
+                  FROM projects`;
+        break;
     }
 
     return new Promise((resolve, reject) => {
