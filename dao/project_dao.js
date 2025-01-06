@@ -117,7 +117,7 @@ const projectQuery = async (queryType, params = {}) => {
                       last_run = '${params.last_run}',
                       mapping_standards = '${params.mapping_standards}',
                       summary_report = '${JSON.stringify(params.summary_report)}'
-                      ${params.checkListResponse != null ? `, checkListReport = '${params.checkListResponse}'` : ''}
+                      ${params.checkListResponse != null ? `, checkListResponse = '${params.checkListResponse}'` : ''}
                       ${params.chatResponse != null ? `, chatResponse = '${params.chatResponse}'` : ''}
                   WHERE project_id = ${params.project_id};`;
         break;
