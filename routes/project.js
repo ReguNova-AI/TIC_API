@@ -20,6 +20,7 @@ const {
   getProjectCountService,
   getOrgProjectService,
   getUserCreatedProjectService,
+  getOrgCountService,
 } = require('../service/project_service');
 
 router.post('/api/v1/project/create', async (req, res) => {
@@ -148,6 +149,47 @@ router.get('/api/v1/projects/counts', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('Get Projects count details route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.get('/api/v1/org/projects/counts', async (req, res) => {
+  try {
+    let {
+      query: { org_id = null, industry_id = null },
+    } = req;
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    industry_id = parseInt(industry_id);
+    const { isValid, errors } = validate({}, {}, { org_id });
+    if (isValid) {
+      let details = await getOrgCountService(req.query);
+      if (details) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.details = details[0];
+        data.message = 'Fetched Details Successfully';
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'Failed to get response';
+        customResponse.messageCode = statusCode;
+      }
+    } else {
+      responseType = CUSTOM_RESPONSE;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('Get org projects count details route', err);
     res.status(500).send(err);
   }
 });
