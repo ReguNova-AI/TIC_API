@@ -84,6 +84,15 @@ const getOrgCountService = async (params) => {
   }
 };
 
+const getSACountService = async () => {
+  try {
+    const data = await projectQuery('GET_SA_PROJECT_COUNTS');
+    return data;
+  } catch (error) {
+    logger.error('Get SA project count service', error);
+  }
+};
+
 module.exports = {
   projectService,
   getProjectService,
@@ -93,4 +102,5 @@ module.exports = {
   getOrgProjectService,
   getUserCreatedProjectService,
   getOrgCountService,
+  getSACountService,
 };
