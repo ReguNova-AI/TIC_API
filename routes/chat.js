@@ -11,21 +11,22 @@ const {
 const { logger } = require('../utils/logger');
 const {
   chatQuestionService,
-  uploadCheckListService,
+  uploadStandardChatService,
+  uploadStandardCheckListService,
 } = require('../service/chat_service');
 const { validate } = require('../utils/helper');
 
 const fileUpload = require('express-fileupload');
 router.use(fileUpload());
 
-router.post('/api/v1/chat/uploadCheckList', async (req, res) => {
+router.post('/api/v1/chat/uploadStandardChat', async (req, res) => {
   try {
     let data = {};
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
     if (req.files || Object.keys(req.files).length !== 0) {
-      const result = await uploadCheckListService(req.files);
+      const result = await uploadStandardChatService(req.files);
       if (result) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
@@ -87,6 +88,39 @@ router.get('/api/v1/chat/askQuestion', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('get file from s3 route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.post('/api/v1/chat/uploadStandardCheckList', async (req, res) => {
+  try {
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    if (req.files || Object.keys(req.files).length > 0) {
+      const result = await uploadStandardCheckListService(req.files);
+      if (result) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.details = result;
+        data.message = 'Checklist Uploaded Successfully';
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'Failed to upload';
+        customResponse.messageCode = statusCode;
+      }
+    } else {
+      responseType = BAD_REQUEST;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = 'File is missing, Please upload file';
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('upload standard checklist route: ', err);
     res.status(500).send(err);
   }
 });
