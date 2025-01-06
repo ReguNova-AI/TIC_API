@@ -52,7 +52,25 @@ const userQuery = async (queryType, params = {}) => {
                   );`;
         break;
       case 'UPDATE_USER':
-        query1 = ``;
+        query1 = `UPDATE users
+                  SET
+                      org_id = ${params.org_id},
+                      role_id = ${params.role_id},
+                      user_first_name = '${params.user_first_name}',
+                      user_last_name = '${params.user_last_name}',
+                      user_profile = '${params.user_profile}',
+                      user_email = '${params.user_email}',
+                      user_phone_no = '${params.user_phone_no}',
+                      user_password = '${params.user_password}',
+                      user_address = '${JSON.stringify(params.user_address)}',
+                      created_by = ${params.created_by},
+                      sector_id = ${params.sector_id},
+                      sector_name = '${params.sector_name}',
+                      org_name = '${params.org_name}',
+                      industry_id = ${params.industry_id},
+                      industry_name = '${params.industry_name}'
+                  WHERE user_id = ${params.user_id};
+            `;
         break;
       case 'DELETE_USER':
         query1 = ``;
