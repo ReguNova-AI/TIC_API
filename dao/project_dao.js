@@ -116,8 +116,9 @@ const projectQuery = async (queryType, params = {}) => {
                       status = '${params.status}',
                       last_run = '${params.last_run}',
                       mapping_standards = '${params.mapping_standards}',
-                      summary_report = '${JSON.stringify(params.summary_report)}',
-                      updated_at = CURRENT_TIMESTAMP
+                      summary_report = '${JSON.stringify(params.summary_report)}'
+                      ${params.checkListResponse != null ? `, checkListReport = '${params.checkListResponse}'` : ''}
+                      ${params.chatResponse != null ? `, chatResponse = '${params.chatResponse}'` : ''}
                   WHERE project_id = ${params.project_id};`;
         break;
       case 'DELETE_PROJECT':
