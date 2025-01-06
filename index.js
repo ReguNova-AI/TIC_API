@@ -17,6 +17,7 @@ const Generic = require('./routes/generic');
 const Upload = require('./routes/upload');
 const Role = require('./routes/role');
 const Certificate = require('./routes/certificate');
+const Chat = require('./routes/chat');
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -30,7 +31,6 @@ app.use(
 );
 app.use(cors());
 app.use(helmet());
-
 
 app.use(async (req, res, next) => {
   const {
@@ -81,10 +81,10 @@ app.use(async (req, res, next) => {
       });
       next();
     } else {
-      res.status(403).send('You no longer have permission to access this page.');
+      res.sendStatus(403);
     }
   } else {
-    res.send(403).send('Authentication failed');
+    res.sendStatus(403);
   }
 });
 
@@ -95,6 +95,7 @@ app.use(Generic);
 app.use(Upload);
 app.use(Role);
 app.use(Certificate);
+app.use(Chat);
 
 const port = process.env.SERVER_PORT;
 
