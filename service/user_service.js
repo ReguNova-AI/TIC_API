@@ -74,10 +74,21 @@ const getOrgUserService = async (params) => {
   }
 };
 
+const updateUserService = async (params) => {
+  try {
+    await userQuery('UPDATE_USER', params);
+    let data = await userQuery('GET_SINGLE_USER', { user_id: params.user_id });
+    return data;
+  } catch (error) {
+    logger.error('update user service', error);
+  }
+};
+
 module.exports = {
   insertUserService,
   getUserService,
   getSignleUserService,
   getUserExistService,
   getOrgUserService,
+  updateUserService,
 };

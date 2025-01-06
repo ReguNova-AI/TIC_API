@@ -19,6 +19,7 @@ const {
   getSignleUserService,
   getUserExistService,
   getOrgUserService,
+  updateUserService,
 } = require('../service/user_service');
 
 router.post('/api/v1/user/create', async (req, res) => {
@@ -215,6 +216,56 @@ router.get('/api/v1/org/users', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('get oa users route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.put('/api/v1/user/update', async (req, res) => {
+  try {
+    const {
+      org_id,
+      role_id,
+      user_first_name,
+      user_last_name,
+      user_email,
+      user_phone_no,
+      user_id,
+    } = req.body;
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    const { isValid, errors } = validate(
+      { user_first_name, user_last_name, user_phone_no },
+      { user_email },
+      { org_id, role_id, user_id },
+    );
+    if (isValid) {
+      let res = await updateUserService(req.body);
+      if (res) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.details = res;
+        data.message = 'Updated User Successfully';
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'Failed to update user';
+        customResponse.messageCode = statusCode;
+      }
+    } else {
+      responseType = CUSTOM_RESPONSE;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = Object.values(errors)
+        .flatMap((err) => Object.values(err))
+        .filter((msg) => msg)
+        .join(', ');
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('User update  route', err);
     res.status(500).send(err);
   }
 });
