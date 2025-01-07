@@ -49,8 +49,10 @@ const createOrgService = async (params) => {
         created_by: params.user_id,
       };
 
-      await insertUserService(userParams);
-      data = await genericQuery('GET_SINGLE_ORGANIZATIONS', { org_id });
+      const res = await insertUserService(userParams);
+      if (res.insertId != null) {
+        data = await genericQuery('GET_SINGLE_ORGANIZATIONS', { org_id });
+      }
     }
     return data;
   } catch (error) {
