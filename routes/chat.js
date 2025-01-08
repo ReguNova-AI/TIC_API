@@ -13,6 +13,8 @@ const {
   chatQuestionService,
   uploadStandardChatService,
   uploadStandardCheckListService,
+  uploadProjectDocsService,
+  chatDataService,
 } = require('../service/chat_service');
 const { validate } = require('../utils/helper');
 
@@ -27,7 +29,7 @@ router.post('/api/v1/chat/uploadStandardChat', async (req, res) => {
     let customResponse = {};
     if (req.files || Object.keys(req.files).length !== 0) {
       const result = await uploadStandardChatService(req.files);
-      if (result) {
+      if (result.ok) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
         data.details = result;
@@ -67,7 +69,7 @@ router.get('/api/v1/chat/askQuestion', async (req, res) => {
       if (res) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
-        data.details = res;
+        data = res;
         data.message = 'Fetched Details Successfully';
       } else {
         responseType = CUSTOM_RESPONSE;
@@ -87,7 +89,7 @@ router.get('/api/v1/chat/askQuestion', async (req, res) => {
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
   } catch (err) {
-    logger.error('get file from s3 route', err);
+    logger.error('ask a question to chatAI route', err);
     res.status(500).send(err);
   }
 });
@@ -121,6 +123,66 @@ router.post('/api/v1/chat/uploadStandardCheckList', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('upload standard checklist route: ', err);
+    res.status(500).send(err);
+  }
+});
+
+router.post('/api/v1/chat/uploadProjectDocs', async (req, res) => {
+  try {
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    if (req.files || Object.keys(req.files).length > 0) {
+      const result = await uploadProjectDocsService(req.files);
+      if (result.ok) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data.details = result;
+        data.message = 'Documents Uploaded Successfully';
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'Failed to upload';
+        customResponse.messageCode = statusCode;
+      }
+    } else {
+      responseType = BAD_REQUEST;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = 'File is missing, Please upload file';
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('upload project docs route: ', err);
+    res.status(500).send(err);
+  }
+});
+
+router.get('/api/v1/chat/data', async (req, res) => {
+  try {
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    let details = await chatDataService();
+    if (details) {
+      responseType = SUCCESS;
+      statusCode = STATUS_CODE_SUCCESS;
+      data = details;
+      data.message = 'Fetched Details Successfully';
+    } else {
+      responseType = CUSTOM_RESPONSE;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.statusCode = statusCode;
+      customResponse.message = 'Failed to get response';
+      customResponse.messageCode = statusCode;
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('get file from s3 route', err);
     res.status(500).send(err);
   }
 });
