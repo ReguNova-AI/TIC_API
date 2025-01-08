@@ -33,10 +33,15 @@ const projectQuery = async (queryType, params = {}) => {
       case 'GET_ORG_PROJECTS':
         query1 = `SELECT 
                       u.user_id,
-                      u.role_id,
                       u.user_first_name,
                       u.user_last_name,
                       u.user_profile,
+                      u.role_id,
+                      u.role_name,
+                      u.industry_id,
+                      u.industry_name,
+                      u.sector_id,
+                      u.sector_name
                       JSON_ARRAYAGG(
                           JSON_OBJECT(
                               'project_id', p.project_id,
@@ -46,10 +51,6 @@ const projectQuery = async (queryType, params = {}) => {
                               'regulatory_standard', p.regulatory_standard,
                               'invite_members', p.invite_members,
                               'documents', p.documents,
-                              'sector_id', p.sector_id,
-                              'sector_name', p.sector_name,
-                              'industry_id', p.industry_id,
-                              'industry_name', p.industry_name,
                               'status', p.status,
                               'no_of_runs', p.no_of_runs,
                               'success_count', p.success_count,
