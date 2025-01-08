@@ -20,6 +20,7 @@ const userQuery = async (queryType, params = {}) => {
         query1 = `INSERT INTO users (
                       org_id, 
                       role_id, 
+                      role_name, 
                       user_first_name, 
                       user_last_name, 
                       user_profile, 
@@ -36,6 +37,7 @@ const userQuery = async (queryType, params = {}) => {
                   ) VALUES (
                       ${params.org_id},
                       ${params.role_id},
+                      ${params.role_name},
                       '${params.user_first_name}',
                       '${params.user_last_name}',
                       '${params.user_profile}',
@@ -56,6 +58,7 @@ const userQuery = async (queryType, params = {}) => {
                   SET
                       org_id = ${params.org_id},
                       role_id = ${params.role_id},
+                      role_name = ${params.role_name},
                       user_first_name = '${params.user_first_name}',
                       user_last_name = '${params.user_last_name}',
                       user_profile = '${params.user_profile}',

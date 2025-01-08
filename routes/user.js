@@ -27,6 +27,7 @@ router.post('/api/v1/user/create', async (req, res) => {
     const {
       org_id,
       role_id,
+      role_name,
       user_first_name,
       user_last_name,
       user_email,
@@ -38,7 +39,7 @@ router.post('/api/v1/user/create', async (req, res) => {
     let statusCode = '';
     let customResponse = {};
     const { isValid, errors } = validate(
-      { user_first_name, user_last_name, user_phone_no },
+      { user_first_name, user_last_name, user_phone_no, role_name },
       { user_email },
       { org_id, role_id, created_by },
     );
@@ -225,6 +226,7 @@ router.put('/api/v1/user/update', async (req, res) => {
     const {
       org_id,
       role_id,
+      role_name,
       user_first_name,
       user_last_name,
       user_email,
@@ -236,7 +238,7 @@ router.put('/api/v1/user/update', async (req, res) => {
     let statusCode = '';
     let customResponse = {};
     const { isValid, errors } = validate(
-      { user_first_name, user_last_name, user_phone_no },
+      { user_first_name, user_last_name, user_phone_no, role_name },
       { user_email },
       { org_id, role_id, user_id },
     );
