@@ -31,16 +31,63 @@ const projectQuery = async (queryType, params = {}) => {
                 `;
         break;
       case 'GET_ORG_PROJECTS':
-        query1 = `SELECT * 
-                  FROM projects
-                  WHERE org_id = ${params.org_id}
-                  ${params.industry_id ? ` AND industry_id = ${params.industry_id}` : ''}
-                  ORDER BY 
-                      CASE 
-                          WHEN status = 'Draft' THEN 1 
-                          ELSE 2 
-                      END, 
-                      last_run DESC;
+        query1 = `SELECT 
+                      u.user_id,
+                      u.role_id,
+                      u.user_first_name,
+                      u.user_last_name,
+                      u.user_profile,
+                      JSON_ARRAYAGG(
+                          JSON_OBJECT(
+                              'project_id', p.project_id,
+                              'project_name', p.project_name,
+                              'project_no', p.project_no,
+                              'project_description', p.project_description,
+                              'regulatory_standard', p.regulatory_standard,
+                              'invite_members', p.invite_members,
+                              'documents', p.documents,
+                              'sector_id', p.sector_id,
+                              'sector_name', p.sector_name,
+                              'industry_id', p.industry_id,
+                              'industry_name', p.industry_name,
+                              'status', p.status,
+                              'no_of_runs', p.no_of_runs,
+                              'success_count', p.success_count,
+                              'fail_count', p.fail_count,
+                              'last_run', p.last_run,
+                              'created_at', p.created_at,
+                              'updated_at', p.updated_at,
+                              'mapping_standards', p.mapping_standards,
+                              'summary_report', p.summary_report,
+                              'isActive', p.isActive,
+                              'chatResponse', p.chatResponse,
+                              'checkListResponse', p.checkListResponse
+                          )
+                      ) AS projects
+                  FROM 
+                      users u
+                  JOIN 
+                      (
+                          SELECT 
+                              *
+                          FROM 
+                              projects
+                          WHERE 
+                              org_id = ${params.org_id}
+                              ${params.industry_id ? ` AND industry_id = ${params.industry_id}` : ''}
+                          ORDER BY 
+                              CASE 
+                                  WHEN status = 'Draft' THEN 1 
+                                  ELSE 2 
+                              END, 
+                              last_run DESC
+                      ) p 
+                  ON 
+                      u.user_id = p.created_by_id
+                  WHERE 
+                      u.org_id = ${params.org_id}
+                  GROUP BY 
+                      u.user_id;
                 `;
         break;
       case 'GET_SINGLE_PROJECT':
