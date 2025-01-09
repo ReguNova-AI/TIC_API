@@ -100,24 +100,18 @@ router.post('/api/v1/chat/uploadStandardCheckList', async (req, res) => {
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (req.files || Object.keys(req.files).length > 0) {
-      const result = await uploadStandardCheckListService(req.files);
-      if (result) {
-        responseType = SUCCESS;
-        statusCode = STATUS_CODE_SUCCESS;
-        data.details = result;
-        data.message = 'Checklist Uploaded Successfully';
-      } else {
-        responseType = CUSTOM_RESPONSE;
-        statusCode = STATUS_CODE_BAD_REQUEST;
-        customResponse.statusCode = statusCode;
-        customResponse.message = 'Failed to upload';
-        customResponse.messageCode = statusCode;
-      }
+    const result = await uploadStandardCheckListService();
+    if (result) {
+      responseType = SUCCESS;
+      statusCode = STATUS_CODE_SUCCESS;
+      data = result;
+      data.message = 'Checklist Uploaded Successfully';
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'File is missing, Please upload file';
+      customResponse.statusCode = statusCode;
+      customResponse.message = 'Failed to upload';
+      customResponse.messageCode = statusCode;
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);

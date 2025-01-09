@@ -1,5 +1,9 @@
 const { logger } = require('../utils/logger');
 // const { chatQuery } = require('../dao/chat_dao');
+const fs = require('fs');
+const path = require('path');
+const axios = require('axios');
+const FormData = require('form-data');
 
 const PYTHON_SERVICE_URL = process.env.PYTHON_SERVICE_URL;
 
@@ -94,29 +98,45 @@ const uploadStandardChatService = async (params) => {
   }
 };
 
-const uploadStandardCheckListService = async (params) => {
+const uploadStandardCheckListService = async () => {
+  const filePath = path.join(__dirname, '../utils/IEC-61400-12-2022.pdf');
+
   try {
-    const formData = new FormData();
+    const form = new FormData();
 
-    // Assuming 'params' contains the file(s) you want to upload
-    const files = Object.values(params);
-    formData.append('file', files);
-    // Make the POST request
-    const response = await fetch(
-      `${PYTHON_SERVICE_URL}/uploadstd_checklist_crt/`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: { 'form-data': { params } }, // Use formData as the body
+    // Append the PDF file to the form
+    const fileStream = fs.createReadStream(filePath);
+    if (!fileStream) {
+      console.log('fileStream isnot found');
+    }
+
+    // Append the PDF file to the form
+    form.append('file', fileStream, {
+      filename: 'your-file.pdf', // File name sent to the server
+      ContentType: 'multipart/form-data; boundary=----boundary123',
+      Accept: 'application/json',
+    });
+
+    // const headers = {
+    //   'Content-Type': 'multipart/form-data; boundary=----boundary123',
+    //   Accept: 'application/json',
+    //   'User-Agent': 'MyCustomUserAgent/1.0',
+    //   Connection: 'keep-alive',
+    // };
+
+    const apiUrl = `${PYTHON_SERVICE_URL}/uploadstd_checklist_crt/`;
+
+    const response = await axios.post(apiUrl, form, {
+      headers: {
+        ...form.getHeaders(), // Automatically set appropriate headers for multipart/form-data
+        // Optional: Include your auth token if needed
+        'User-Agent': 'MyCustomUserAgent/1.0', // Add custom User-Agent header
       },
-    );
-
-    console.log('Response:', response);
+    });
 
     // Handle successful responses
-    if (response.ok) {
-      const responseData = await response.json();
-      return { success: true, data: responseData };
+    if (response.status === 200) {
+      return { success: true, data: response.data };
     } else {
       // Handle non-OK responses
       console.error(
@@ -126,7 +146,7 @@ const uploadStandardCheckListService = async (params) => {
       );
       return {
         success: false,
-        error: `Server returned status ${response.status}`,
+        error: `Server returned status ${response.statusText}`,
       };
     }
   } catch (error) {
