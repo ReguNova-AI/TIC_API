@@ -27,10 +27,11 @@ const getFileFromS3 = async (params) => {
     for (const key of params) {
       const getParams = {
         Key: key,
-        Bucket: process.env.S3_BUCKET_NAME,
+        Bucket: process.env.BUCKET_NAME,
       };
       const response = await getFromS3(getParams);
-      data.push(response);
+      let obj = { key, response };
+      data.push(obj);
     }
     return data;
   } catch (error) {

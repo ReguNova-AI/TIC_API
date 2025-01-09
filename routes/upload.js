@@ -62,7 +62,7 @@ router.get('/api/v1/getFromS3', async (req, res) => {
       if (res) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
-        data.details = res;
+        data = res;
         data.message = 'Fetched Details Successfully';
       } else {
         responseType = CUSTOM_RESPONSE;
@@ -74,7 +74,7 @@ router.get('/api/v1/getFromS3', async (req, res) => {
     } else {
       responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'Image key not found, please  select an image';
+      customResponse.message = 'Image key not found, please select an image';
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
