@@ -41,7 +41,7 @@ const projectQuery = async (queryType, params = {}) => {
                       u.industry_id,
                       u.industry_name,
                       u.sector_id,
-                      u.sector_name
+                      u.sector_name,
                       JSON_ARRAYAGG(
                           JSON_OBJECT(
                               'project_id', p.project_id,
