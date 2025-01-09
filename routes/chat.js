@@ -27,24 +27,18 @@ router.post('/api/v1/chat/uploadStandardChat', async (req, res) => {
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (req.files || Object.keys(req.files).length !== 0) {
-      const result = await uploadStandardChatService(req.files);
-      if (result.ok) {
-        responseType = SUCCESS;
-        statusCode = STATUS_CODE_SUCCESS;
-        data.details = result;
-        data.message = 'File Uploaded Successfully';
-      } else {
-        responseType = CUSTOM_RESPONSE;
-        statusCode = STATUS_CODE_BAD_REQUEST;
-        customResponse.statusCode = statusCode;
-        customResponse.message = 'Failed to upload';
-        customResponse.messageCode = statusCode;
-      }
+    const result = await uploadStandardChatService();
+    if (result) {
+      responseType = SUCCESS;
+      statusCode = STATUS_CODE_SUCCESS;
+      data = result;
+      data.message = 'Uploaded Successfully';
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'File is missing, Please upload file';
+      customResponse.statusCode = statusCode;
+      customResponse.message = 'Failed to get response';
+      customResponse.messageCode = statusCode;
     }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
@@ -110,7 +104,7 @@ router.post('/api/v1/chat/uploadStandardCheckList', async (req, res) => {
       responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
       customResponse.statusCode = statusCode;
-      customResponse.message = 'Failed to upload';
+      customResponse.message = 'Failed to get response';
       customResponse.messageCode = statusCode;
     }
     let response = setResponse(responseType, '', data, customResponse);
