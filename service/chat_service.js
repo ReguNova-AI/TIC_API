@@ -62,23 +62,37 @@ const chatQuestionService = async (params) => {
 //   }
 // };
 
-const uploadStandardChatService = async (params) => {
+const uploadStandardChatService = async () => {
   try {
-    const formData = new FormData();
+    const filePath = path.join(__dirname, '../utils/IEC-61400-12-2022.pdf');
+    const form = new FormData();
 
-    // Assuming 'params' contains the file(s) you want to upload
-    const files = Object.values(params);
-    formData.append('file', files[0]); // Add the first file to FormData
+    // Append the PDF file to the form
+    const fileStream = fs.createReadStream(filePath);
+    if (!fileStream) {
+      console.log('fileStream isnot found');
+    }
 
-    const response = await fetch(`${PYTHON_SERVICE_URL}/uploadstd_chat/`, {
-      method: 'POST',
-      body: formData, // Set the formData as the request body
-      redirect: 'follow',
+    // Append the PDF file to the form
+    form.append('file', fileStream, {
+      filename: 'your-file.pdf', // File name sent to the server
+      ContentType: 'multipart/form-data; boundary=----boundary123',
+      Accept: 'application/json',
     });
 
-    if (response.ok) {
-      const responseData = await response.json();
-      return { success: true, data: responseData };
+    const apiUrl = `${PYTHON_SERVICE_URL}/uploadstd_chat/`;
+
+    const response = await axios.post(apiUrl, form, {
+      headers: {
+        ...form.getHeaders(), // Automatically set appropriate headers for multipart/form-data
+        // Optional: Include your auth token if needed
+        'User-Agent': 'MyCustomUserAgent/1.0', // Add custom User-Agent header
+      },
+    });
+
+    // Handle successful responses
+    if (response.status === 200) {
+      return { success: true, data: response.data };
     } else {
       // Handle non-OK responses
       console.error(
@@ -88,11 +102,10 @@ const uploadStandardChatService = async (params) => {
       );
       return {
         success: false,
-        error: `Server returned status ${response.status}`,
+        error: `Server returned status ${response.statusText}`,
       };
     }
   } catch (error) {
-    console.error('Chat upload service error', error);
     logger.error('Chat upload service error', error);
     return { response: false, error };
   }
