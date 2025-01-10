@@ -32,6 +32,19 @@ const getFromS3 = async (params) => {
   });
 };
 
+const deleteFromS3 = async (params) => {
+  return new Promise((resolve, reject) => {
+    s3.deleteObject(params, function (err, data) {
+      if (err) {
+        logger.error(err);
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+};
+
 const smtpTransporter = nodemailer.createTransport({
   port: process.env.SMTP_PORT,
   host: process.env.SMTP_HOST,
@@ -43,4 +56,4 @@ const smtpTransporter = nodemailer.createTransport({
   debug: true,
 });
 
-module.exports = { uploadToS3, getFromS3, smtpTransporter };
+module.exports = { uploadToS3, getFromS3, smtpTransporter, deleteFromS3 };

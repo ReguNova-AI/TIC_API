@@ -1,5 +1,5 @@
 const { logger } = require('../utils/logger');
-const { uploadToS3, getFromS3 } = require('../config/aws_config');
+const { uploadToS3, getFromS3, deleteFromS3 } = require('../config/aws_config');
 
 const uploadFileToS3 = async (documents, type) => {
   try {
@@ -40,7 +40,21 @@ const getFileFromS3 = async (params) => {
   }
 };
 
+const deleteFileFromS3 = async (params) => {
+  try {
+    const deleteParams = {
+      Key: params,
+      Bucket: process.env.BUCKET_NAME,
+    };
+    const response = await deleteFromS3(deleteParams);
+    return response;
+  } catch (error) {
+    logger.error('delete file from s3 service', error);
+  }
+};
+
 module.exports = {
   uploadFileToS3,
   getFileFromS3,
+  deleteFileFromS3,
 };

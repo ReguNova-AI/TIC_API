@@ -8,9 +8,14 @@ const {
   STATUS_CODE_SUCCESS,
   STATUS_CODE_BAD_REQUEST,
   CUSTOM_RESPONSE,
+  STATUS_CODE_INTERNAL_SERVER_ERROR,
 } = require('../constants/response_constants');
 const { logger } = require('../utils/logger');
-const { uploadFileToS3, getFileFromS3 } = require('../service/upload_service');
+const {
+  uploadFileToS3,
+  getFileFromS3,
+  deleteFileFromS3,
+} = require('../service/upload_service');
 
 router.post('/api/v1/uploadToS3', async (req, res) => {
   try {
@@ -44,7 +49,7 @@ router.post('/api/v1/uploadToS3', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('upload file to S3 route', err);
-    res.status(500).send(err);
+    res.status(STATUS_CODE_INTERNAL_SERVER_ERROR).send(err);
   }
 });
 
@@ -80,7 +85,34 @@ router.post('/api/v1/getFromS3', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('get file from s3 route', err);
-    res.status(500).send(err);
+    res.status(STATUS_CODE_INTERNAL_SERVER_ERROR).send(err);
+  }
+});
+
+router.post('/api/v1/deleteFromS3', async (req, res) => {
+  try {
+    const {
+      body: { imageKey = '' },
+    } = req;
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    if (imageKey) {
+      await deleteFileFromS3(imageKey);
+      responseType = SUCCESS;
+      statusCode = STATUS_CODE_SUCCESS;
+      data.message = 'Deleted Successfully';
+    } else {
+      responseType = CUSTOM_RESPONSE;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.message = 'Image key not found, please select an image';
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('delete file from s3 route', err);
+    res.status(STATUS_CODE_INTERNAL_SERVER_ERROR).send(err);
   }
 });
 
