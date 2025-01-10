@@ -48,7 +48,7 @@ router.post('/api/v1/uploadToS3', async (req, res) => {
   }
 });
 
-router.get('/api/v1/getFromS3', async (req, res) => {
+router.post('/api/v1/getFromS3', async (req, res) => {
   try {
     const {
       body: { imageKeys = [] },
