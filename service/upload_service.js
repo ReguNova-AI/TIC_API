@@ -1,12 +1,13 @@
 const { logger } = require('../utils/logger');
 const { uploadToS3, getFromS3 } = require('../config/aws_config');
 
-const uploadFileToS3 = async (documents) => {
+const uploadFileToS3 = async (documents, type) => {
   try {
     let data = [];
     for (const item of documents) {
       const fileContent = item;
-      const fileName = `File_` + Math.random().toString(36).substring(6);
+      const fileName =
+        `File_` + Math.random().toString(36).substring(6) + '.' + type;
       const s3Params = {
         Bucket: process.env.BUCKET_NAME,
         Key: fileName,

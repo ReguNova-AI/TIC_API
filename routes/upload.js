@@ -15,18 +15,18 @@ const { uploadFileToS3, getFileFromS3 } = require('../service/upload_service');
 router.post('/api/v1/uploadToS3', async (req, res) => {
   try {
     const {
-      body: { documents = [] },
+      body: { documents = [], type = '' },
     } = req;
     let data = {};
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (documents && documents.length > 0) {
-      let res = await uploadFileToS3(documents);
-      if (res) {
+    if (documents && documents.length > 0 && type.length > 0) {
+      let response = await uploadFileToS3(documents, type);
+      if (response) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
-        data.details = res;
+        data.details = response;
         data.message = 'Uploaded Successfully';
       } else {
         responseType = CUSTOM_RESPONSE;
