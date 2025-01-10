@@ -162,14 +162,18 @@ const projectQuery = async (queryType, params = {}) => {
                               industry_id = ${params.industry_id},
                               industry_name = '${params.industry_name}',
                               status = '${params.status}',
-                              last_run = '${params.last_run}',
+                              last_run = '${params.last_run != null ? params.last_run : null}',
                               mapping_standards = '${params.mapping_standards}',
                               summary_report = '${JSON.stringify(params.summary_report)}'
                         `;
 
         // Conditionally append checkListResponse and chatResponse
         if (params.checkListResponse) {
-          query1 += `, checkListResponse = '${JSON.stringify(params.checkListResponse)}'`;
+          const escapedCheckListResponse = params.checkListResponse.replace(
+            /'/g,
+            "''",
+          );
+          query1 += `, checkListResponse = '${escapedCheckListResponse}'`;
         }
         if (params.chatResponse) {
           query1 += `, chatResponse = '${JSON.stringify(params.chatResponse)}'`;
