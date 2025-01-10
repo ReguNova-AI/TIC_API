@@ -8,15 +8,56 @@ const projectQuery = async (queryType, params = {}) => {
     let query1 = '';
     switch (queryType) {
       case 'GET_PROJECTS':
-        query1 = `SELECT * 
-                  FROM projects
-                  ORDER BY 
-                      CASE 
-                          WHEN status = 'Draft' THEN 1 
-                          ELSE 2 
-                      END, 
-                      last_run DESC;
-                `;
+        // query1 = `SELECT *
+        //           FROM projects
+        //           ORDER BY
+        //               CASE
+        //                   WHEN status = 'Draft' THEN 1
+        //                   ELSE 2
+        //               END,
+        //               last_run DESC;
+        //         `;
+        query1 = `SELECT 
+                      o.org_id, 
+                      o.org_name, 
+                      o.org_logo, 
+                      o.sector_id, 
+                      o.sector_name,
+                      -- Aggregate the industries into a JSON array
+                      JSON_ARRAYAGG(
+                          JSON_OBJECT(
+                              'industry_id', industry_id,
+                              'industry_name', i.industry_name,
+                              -- For each industry, aggregate the associated projects into a JSON array
+                              'projects', (
+                                  SELECT JSON_ARRAYAGG(
+                                      JSON_OBJECT(
+                                          'project_id', p.project_id,
+                                          'project_name', p.project_name,
+                                          'project_no', p.project_no,
+                                          'project_description', p.project_description,
+                                          'regulatory_standard', p.regulatory_standard,
+                                          'invite_members', p.invite_members,
+                                          'status', p.status,
+                                          'no_of_runs', p.no_of_runs,
+                                          'success_count', p.success_count,
+                                          'fail_count', p.fail_count,
+                                          'last_run', p.last_run,
+                                          'created_at', p.created_at,
+                                          'updated_at', p.updated_at,
+                                          'isActive', p.isActive
+                                      )
+                                  )
+                                  FROM projects p
+                                  WHERE p.org_id = o.org_id
+                                    AND FIND_IN_SET(p.industry_id, o.industries) > 0
+                              )
+                          )
+                      ) AS industries
+                  FROM organizations o
+                  LEFT JOIN industries i ON FIND_IN_SET(i.industry_id, o.industries) > 0
+                  GROUP BY o.org_id, o.sector_id;
+            `;
         break;
       case 'GET_USER_CREATED_PROJECTS':
         query1 = `SELECT * 
@@ -50,7 +91,6 @@ const projectQuery = async (queryType, params = {}) => {
                               'project_description', p.project_description,
                               'regulatory_standard', p.regulatory_standard,
                               'invite_members', p.invite_members,
-                              'documents', p.documents,
                               'status', p.status,
                               'no_of_runs', p.no_of_runs,
                               'success_count', p.success_count,
@@ -58,11 +98,7 @@ const projectQuery = async (queryType, params = {}) => {
                               'last_run', p.last_run,
                               'created_at', p.created_at,
                               'updated_at', p.updated_at,
-                              'mapping_standards', p.mapping_standards,
-                              'summary_report', p.summary_report,
-                              'isActive', p.isActive,
-                              'chatResponse', p.chatResponse,
-                              'checkListResponse', p.checkListResponse
+                              'isActive', p.isActive
                           )
                       ) AS projects
                   FROM 
