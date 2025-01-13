@@ -21,6 +21,7 @@ const {
   getOrgUserService,
   updateUserService,
   getOrgUserCountService,
+  getSaUserCountService,
 } = require('../service/user_service');
 
 router.post('/api/v1/user/create', async (req, res) => {
@@ -217,7 +218,7 @@ router.get('/api/v1/org/users', async (req, res) => {
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
   } catch (err) {
-    logger.error('get oa users route', err);
+    logger.error('get org users route', err);
     res.status(500).send(err);
   }
 });
@@ -285,11 +286,11 @@ router.get('/api/v1/org/userCount', async (req, res) => {
     industry_id = parseInt(industry_id);
     const { isValid, errors } = validate({}, {}, { org_id });
     if (isValid) {
-      let res = await getOrgUserCountService({ org_id, industry_id });
-      if (res) {
+      let response = await getOrgUserCountService({ org_id, industry_id });
+      if (response) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
-        data = res;
+        data = response;
         data.message = 'Fetched Details Successfully';
       } else {
         responseType = CUSTOM_RESPONSE;
@@ -310,6 +311,33 @@ router.get('/api/v1/org/userCount', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('get org user count route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.get('/api/v1/sa/userCount', async (req, res) => {
+  try {
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    let details = await getSaUserCountService();
+    if (details) {
+      responseType = SUCCESS;
+      statusCode = STATUS_CODE_SUCCESS;
+      data = details;
+      data.message = 'Fetched Details Successfully';
+    } else {
+      responseType = CUSTOM_RESPONSE;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.statusCode = statusCode;
+      customResponse.message = 'Failed to get response';
+      customResponse.messageCode = statusCode;
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('get sa user count route', err);
     res.status(500).send(err);
   }
 });
