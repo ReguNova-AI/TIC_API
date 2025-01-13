@@ -86,8 +86,8 @@ const updateUserService = async (params) => {
 
 const getOrgUserCountService = async (params) => {
   try {
-    const data = await userQuery('GET_ORG_USERS', params);
-    return data.length;
+    const data = await userQuery('GET_ORG_USER_COUNT', params);
+    return data;
   } catch (error) {
     logger.error('get org user service', error);
   }
