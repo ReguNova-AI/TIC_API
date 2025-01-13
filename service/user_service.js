@@ -84,6 +84,15 @@ const updateUserService = async (params) => {
   }
 };
 
+const getOrgUserCountService = async (params) => {
+  try {
+    const data = await userQuery('GET_ORG_USERS', params);
+    return data.length;
+  } catch (error) {
+    logger.error('get org user service', error);
+  }
+};
+
 module.exports = {
   insertUserService,
   getUserService,
@@ -91,4 +100,5 @@ module.exports = {
   getUserExistService,
   getOrgUserService,
   updateUserService,
+  getOrgUserCountService,
 };
