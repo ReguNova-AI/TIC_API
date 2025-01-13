@@ -1,6 +1,7 @@
 const { logger } = require('../utils/logger');
 const { genericQuery } = require('../dao/generic_dao');
 const { insertUserService } = require('../service/user_service');
+const { loginQuery } = require('../dao/login_dao');
 
 const getOrgService = async (params) => {
   try {
@@ -23,36 +24,46 @@ const getSignleOrgService = async (params) => {
 const createOrgService = async (params) => {
   try {
     let data = {};
-    const response = await genericQuery('CREATE_ORGANISATION', params);
-    let org_id = response?.insertId ? response.insertId : 0;
-    const role_name = 'Org Super Admin';
-    if (org_id) {
-      const [{ role_id = null } = {}] = await genericQuery(
-        'GET_ROLE_ID_BY_NAME',
-        { role_name },
-      );
-      let userParams = {
-        org_id,
-        org_name: params.org_name,
-        sector_id: params.sector_id,
-        sector_name: params.sector_name,
-        user_first_name: params.contact_json.primary_contact.first_name,
-        user_last_name: params.contact_json.primary_contact.last_name,
-        user_email: params.contact_json.primary_contact.email,
-        user_phone_no: params.contact_json.primary_contact.phone,
-        industry_id: params.industries[0],
-        industry_name: params.industry_names[0],
-        user_address: null,
-        user_profile: null,
-        role_id,
-        role_name,
-        created_by: params.user_id,
-      };
+    const [{ user_id = null } = {}] = await loginQuery('CHECK_IF_USER_EXISTS', {
+      email: params.contact_json.primary_contact.email,
+    });
+    if (user_id) {
+      const response = await genericQuery('CREATE_ORGANISATION', params);
+      let org_id = response?.insertId ? response.insertId : 0;
+      const role_name = 'Org Super Admin';
+      if (org_id) {
+        const [{ role_id = null } = {}] = await genericQuery(
+          'GET_ROLE_ID_BY_NAME',
+          { role_name },
+        );
+        let userParams = {
+          org_id,
+          org_name: params.org_name,
+          sector_id: params.sector_id,
+          sector_name: params.sector_name,
+          user_first_name: params.contact_json.primary_contact.first_name,
+          user_last_name: params.contact_json.primary_contact.last_name,
+          user_email: params.contact_json.primary_contact.email,
+          user_phone_no: params.contact_json.primary_contact.phone,
+          industry_id: params.industries[0],
+          industry_name: params.industry_names[0],
+          user_address: null,
+          user_profile: null,
+          role_id,
+          role_name,
+          created_by: params.user_id,
+        };
 
-      const res = await insertUserService(userParams);
-      if (res.insertId != null) {
-        data = await genericQuery('GET_SINGLE_ORGANIZATIONS', { org_id });
+        const res = await insertUserService(userParams);
+        if (res.insertId != null) {
+          data = await genericQuery('GET_SINGLE_ORGANIZATIONS', { org_id });
+        }
       }
+    } else {
+      return {
+        message: 'Primary contact email is already in use',
+        is_primary_contact_exist: true,
+      };
     }
     return data;
   } catch (error) {
