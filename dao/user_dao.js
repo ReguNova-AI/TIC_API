@@ -37,7 +37,7 @@ const userQuery = async (queryType, params = {}) => {
                   ) VALUES (
                       ${params.org_id},
                       ${params.role_id},
-                      ${params.role_name},
+                      '${params.role_name}',
                       '${params.user_first_name}',
                       '${params.user_last_name}',
                       '${params.user_profile}',
