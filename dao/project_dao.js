@@ -156,11 +156,8 @@ const projectQuery = async (queryType, params = {}) => {
                       industry_name, 
                       status,
                       mapping_standards, 
-                      summary_report,
-                      complianceAssesment,
-                      history,
-                      standardUploaded,
-                      no_of_runs,
+                      summary_report
+                      ${params.no_of_runs ? ` , no_of_runs ` : ''},
                       ${params.last_run ? `, last_run ` : ''}
                   ) 
                   VALUES (
@@ -180,11 +177,8 @@ const projectQuery = async (queryType, params = {}) => {
                       '${params.industry_name}',
                       '${params.status}',
                       '${params.mapping_standards}',
-                      '${JSON.stringify(params.summary_report)}',
-                      '${JSON.stringify(params.complianceAssesment)}',
-                      '${JSON.stringify(params.history)}',
-                      ${JSON.stringify(params.standardUploaded)},
-                      ${params.no_of_runs},
+                      '${JSON.stringify(params.summary_report)}', 
+                      ${params.no_of_runs} ? '${params.no_of_runs}' : ''}
                       ${params.last_run ? `, '${params.last_run}'` : ''}
         );`;
         break;
@@ -208,11 +202,11 @@ const projectQuery = async (queryType, params = {}) => {
                               status = '${params.status}',
                               last_run = '${params.last_run != null ? params.last_run : null}',
                               mapping_standards = '${params.mapping_standards}',
-                              summary_report = '${JSON.stringify(params.summary_report)}',
-                              complianceAssesment = '${JSON.stringify(params.complianceAssesment)}',
-                              history = '${JSON.stringify(params.history)}',
-                              standardUploaded = ${params.standardUploaded},
-                              no_of_runs = ${params.no_of_runs}
+                              summary_report = '${JSON.stringify(params.summary_report)}'
+                              ${params.complianceAssesment}? ` , complianceAssesment = '${JSON.stringify(params.complianceAssesment)}'` : ''}
+                              ${params.history}? ` , history = '${JSON.stringify(params.history)}'` : ''}
+                              ${params.no_of_runs ? ` , no_of_runs = ${params.no_of_runs}` : ''}
+                              ${params.standardUploaded ? ` , standard_uploaded = ${params.standardUploaded}` : ''}
                         `;
 
         // Conditionally append checkListResponse and chatResponse
