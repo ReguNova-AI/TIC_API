@@ -158,7 +158,12 @@ router.post('/api/v1/organizations/create', async (req, res) => {
     let customResponse = {};
     if (isValid) {
       let res = await createOrgService(req.body);
-      if (res) {
+      if (res && res.is_primary_contact_exist) {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = res.message;
+      } else if (res) {
         responseType = SUCCESS;
         statusCode = STATUS_CODE_SUCCESS;
         data.details = res;
