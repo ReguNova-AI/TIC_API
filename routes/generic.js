@@ -22,6 +22,7 @@ const {
   getSingleSectorService,
   createSectorService,
   getOrgDetailsExistService,
+  getOrgCountService,
 } = require('../service/generic_service');
 
 router.get('/api/v1/organizations/exist', async (req, res) => {
@@ -95,6 +96,37 @@ router.get('/api/v1/organizations', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('get organizations route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.get('/api/v1/organizationCount', async (req, res) => {
+  try {
+    const {
+      body: {},
+    } = req;
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    let message = '';
+    let details = await getOrgCountService();
+    if (details) {
+      responseType = SUCCESS;
+      statusCode = STATUS_CODE_SUCCESS;
+      data = details;
+      message = 'Fetched Details Successfully';
+    } else {
+      responseType = CUSTOM_RESPONSE;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.statusCode = statusCode;
+      customResponse.message = 'Failed to get response';
+      customResponse.messageCode = statusCode;
+    }
+    let response = setResponse(responseType, message, data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('get organization count route', err);
     res.status(500).send(err);
   }
 });

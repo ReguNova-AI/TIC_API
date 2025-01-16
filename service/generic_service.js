@@ -27,11 +27,11 @@ const createOrgService = async (params) => {
     const [{ user_id = null } = {}] = await loginQuery('CHECK_IF_USER_EXISTS', {
       email: params.contact_json.primary_contact.email,
     });
-    if (user_id) {
+    if (!user_id > 0) {
       const response = await genericQuery('CREATE_ORGANISATION', params);
       let org_id = response?.insertId ? response.insertId : 0;
       const role_name = 'Org Super Admin';
-      if (org_id) {
+      if (org_id > 0) {
         const [{ role_id = null } = {}] = await genericQuery(
           'GET_ROLE_ID_BY_NAME',
           { role_name },
@@ -147,6 +147,15 @@ const getOrgDetailsExistService = async (params) => {
   }
 };
 
+const getOrgCountService = async (params) => {
+  try {
+    const data = await genericQuery('GET_ORG_PROJECT_COUNTS', params);
+    return data;
+  } catch (error) {
+    logger.error('Get org project count service', error);
+  }
+};
+
 module.exports = {
   getOrgService,
   getSignleOrgService,
@@ -158,4 +167,5 @@ module.exports = {
   getSingleSectorService,
   createSectorService,
   getOrgDetailsExistService,
+  getOrgCountService,
 };
