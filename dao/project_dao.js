@@ -179,7 +179,7 @@ const projectQuery = async (queryType, params = {}) => {
                       '${params.mapping_standards}',
                       '${JSON.stringify(params.summary_report)}', 
                       ${params.no_of_runs} ? '${params.no_of_runs}' : ''}
-                      ${params.last_run ? `, '${params.last_run}'` : ''}
+                      ${params.last_run ? ` , '${params.last_run}'` : ''}
         );`;
         break;
       case 'UPDATE_PROJECT':
