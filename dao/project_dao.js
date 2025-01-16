@@ -157,7 +157,6 @@ const projectQuery = async (queryType, params = {}) => {
                       status,
                       mapping_standards, 
                       summary_report
-                      ${params.no_of_runs ? ` , no_of_runs ` : ''}
                       ${params.last_run ? `, last_run ` : ''}
                   ) 
                   VALUES (
@@ -178,7 +177,6 @@ const projectQuery = async (queryType, params = {}) => {
                       '${params.status}',
                       '${params.mapping_standards}',
                       '${JSON.stringify(params.summary_report)}'
-                      ${params.no_of_runs} ? ' , ${params.no_of_runs}' : ''}
                       ${params.last_run ? ` , '${params.last_run}'` : ''}
         );`;
         break;
