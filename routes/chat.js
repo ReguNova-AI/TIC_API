@@ -15,6 +15,7 @@ const {
   uploadStandardCheckListService,
   uploadProjectDocsService,
   chatDataService,
+  chatRunComplainceAssessmentService,
 } = require('../service/chat_service');
 const { validate } = require('../utils/helper');
 
@@ -168,6 +169,43 @@ router.get('/api/v1/chat/data', async (req, res) => {
       customResponse.messageCode = statusCode;
     }
     let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('get file from s3 route', err);
+    res.status(500).send(err);
+  }
+});
+
+router.get('/api/v1/chat/runComplainceAssessment', async (req, res) => {
+  try {
+    const {
+      query: { requirements = '' },
+    } = req;
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    let message = '';
+    if (requirements.length > 0) {
+      let details = await chatRunComplainceAssessmentService(requirements);
+      if (details) {
+        responseType = SUCCESS;
+        statusCode = STATUS_CODE_SUCCESS;
+        data = details;
+        data.message = 'Fetched Details Successfully';
+      } else {
+        responseType = CUSTOM_RESPONSE;
+        statusCode = STATUS_CODE_BAD_REQUEST;
+        customResponse.statusCode = statusCode;
+        customResponse.message = 'Failed to get response';
+        customResponse.messageCode = statusCode;
+      }
+    } else {
+      responseType = BAD_REQUEST;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      message = 'requirements is required';
+    }
+    let response = setResponse(responseType, message, data, customResponse);
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('get file from s3 route', err);

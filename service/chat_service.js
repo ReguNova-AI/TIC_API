@@ -230,10 +230,88 @@ const chatDataService = async () => {
   }
 };
 
+const chatRunComplainceAssessmentService = async (requirements) => {
+  try {
+    // Split the response by '---' to separate sections
+    const sections = requirements.split('---').slice(1); // Skip the first "Title" section
+    // console.log("sections",sections)
+
+    // Check if the last section is the Summary and ensure it's handled correctly
+    const lastSection = sections[sections.length - 1]?.trim();
+
+    // If the last section starts with "Summary:", we explicitly name it
+    if (lastSection?.startsWith('Summary:')) {
+      // Set the last section as Summary with a defined title
+      sections[sections.length - 1] = `**Summary**\n${lastSection}`;
+    }
+
+    const pointsArray = [];
+    // Now process all sections
+    sections.map((section, index) => {
+      let lines = section?.trim()?.split('\n'); // Split the section into lines
+
+      // Extract and clean the title of the section
+      let title = lines[0]
+        .replace('**', '') // Remove asterisks around the title
+        .replace(':', '') // Remove colon after section title
+        .trim();
+      title = title.replace('**', '');
+      if (title?.startsWith('Summary')) {
+        lines.push(title.replace('Summary', `${index}.`));
+        lines[0] = title.replace('Summary** ', `${index}.`);
+
+        title = 'Summary';
+      } else {
+        title = title.replace(`Section ${index + 1}`, '')?.trim();
+      }
+
+      // Process the remaining lines as "points" and clean the list
+      const points = lines
+        .slice(1) // Skip the first line if necessary, or use `.map()` without `.slice()`
+        .map((line) => {
+          // Regular expression to remove number, dot, and optional space
+          let lineValue = line.replace(/^\d+\.\s*/, '').trim();
+          if (lineValue) {
+            pointsArray.push(lineValue); // Push the cleaned value into pointsArray
+          }
+        });
+      // console.log("title",title);
+      // console.log("points",points);x
+
+      return { title, points };
+    });
+
+    const response = await fetch(
+      `${PYTHON_SERVICE_URL}/run_complaince_assessment/?requirements=${encodeURIComponent(pointsArray)}`,
+    );
+
+    if (response.ok) {
+      const responseData = await response.json();
+      return { success: true, data: responseData };
+    } else {
+      // Handle non-OK responses
+      console.error(
+        'Error: Non-OK response received',
+        response.status,
+        response.statusText,
+      );
+      return {
+        success: false,
+        error: `Server returned status ${response.status}`,
+      };
+    }
+  } catch (error) {
+    // Log the error and return a consistent structure
+    console.error('Chat run complaince assessment service error:', error);
+    return { success: false, error: 'An error occurred while fetching data' };
+  }
+};
+
 module.exports = {
   uploadStandardChatService,
   chatQuestionService,
   uploadStandardCheckListService,
   uploadProjectDocsService,
   chatDataService,
+  chatRunComplainceAssessmentService,
 };
