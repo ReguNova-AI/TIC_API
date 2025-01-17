@@ -25,7 +25,7 @@ const validate = (
 
   // Validate string array objects
   Object.entries(strArrObj).forEach(([key, item]) => {
-    if (_.isEmpty(item.trim())) {
+    if (_.isEmpty(item?.trim())) {
       setError('strArrObj', key, `Field ${key} is empty`);
     }
   });
