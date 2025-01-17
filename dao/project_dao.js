@@ -158,6 +158,7 @@ const projectQuery = async (queryType, params = {}) => {
                       mapping_standards, 
                       summary_report
                       ${params.last_run ? `, last_run ` : ''}
+                      ${params.history ? `, history ` : ''}
                   ) 
                   VALUES (
                       '${params.project_name}',
@@ -178,6 +179,7 @@ const projectQuery = async (queryType, params = {}) => {
                       '${params.mapping_standards}',
                       '${JSON.stringify(params.summary_report)}'
                       ${params.last_run ? ` , '${params.last_run}'` : ''}
+                      ${params.history ? `, '${JSON.stringify(params.history)}'` : ''}
         );`;
         break;
       case 'UPDATE_PROJECT':
