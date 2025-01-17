@@ -297,7 +297,7 @@ router.put('/api/v1/project/update', async (req, res) => {
         responseType = CUSTOM_RESPONSE;
         statusCode = STATUS_CODE_BAD_REQUEST;
         customResponse.statusCode = statusCode;
-        customResponse.message = 'Failed to create project';
+        customResponse.message = 'Failed to update project';
         customResponse.messageCode = statusCode;
       }
     } else {

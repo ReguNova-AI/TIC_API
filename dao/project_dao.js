@@ -201,12 +201,12 @@ const projectQuery = async (queryType, params = {}) => {
                               last_run = '${params.last_run != null ? params.last_run : null}',
                               mapping_standards = '${params.mapping_standards}',
                               summary_report = '${JSON.stringify(params.summary_report)}'
-                              ${params.complianceAssesment}? ` , complianceAssesment = '${JSON.stringify(params.complianceAssesment)}'` : ''}
-                              ${params.history}? ` , history = '${JSON.stringify(params.history)}'` : ''}
+                              ${params.complianceAssesment ? `, complianceAssesment = '${JSON.stringify(params.complianceAssesment)}'` : ''}
+                              ${params.history ? `, history = '${JSON.stringify(params.history)}'` : ''}
                               ${params.no_of_runs ? ` , no_of_runs = ${params.no_of_runs}` : ''}
-                              ${params.standardUploaded ? ` , standard_uploaded = ${params.standardUploaded}` : ''}
+                              ${params.standardUploaded != null ? ` , standardUploaded = '${params.standardUploaded}'` : ''}
                         `;
-
+                        
         // Conditionally append checkListResponse and chatResponse
         if (params.checkListResponse) {
           const escapedCheckListResponse = params.checkListResponse.replace(
