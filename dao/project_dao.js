@@ -159,6 +159,7 @@ const projectQuery = async (queryType, params = {}) => {
                       summary_report
                       ${params.last_run ? `, last_run ` : ''}
                       ${params.history ? `, history ` : ''}
+                      ${params.no_of_runs ? `, no_of_runs ` : ''}
                   ) 
                   VALUES (
                       '${params.project_name}',
@@ -180,6 +181,7 @@ const projectQuery = async (queryType, params = {}) => {
                       '${JSON.stringify(params.summary_report)}'
                       ${params.last_run ? ` , '${params.last_run}'` : ''}
                       ${params.history ? `, '${JSON.stringify(params.history)}'` : ''}
+                      ${params.no_of_runs ? `, no_of_runs = ${params.no_of_runs}` : ''}
         );`;
         break;
       case 'UPDATE_PROJECT':
