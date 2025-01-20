@@ -18,6 +18,7 @@ const Upload = require('./routes/upload');
 const Role = require('./routes/role');
 const Certificate = require('./routes/certificate');
 const Chat = require('./routes/chat');
+const Regulatories = require('./routes/regulatory');
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -96,6 +97,7 @@ app.use(Upload);
 app.use(Role);
 app.use(Certificate);
 app.use(Chat);
+app.use(Regulatories);
 
 const port = process.env.SERVER_PORT;
 
