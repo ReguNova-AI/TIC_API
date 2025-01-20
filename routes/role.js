@@ -14,6 +14,7 @@ const {
   getRoleService,
   getSingleRoleService,
   createRoleService,
+  getPermissionsService,
 } = require('../service/role_service');
 const { validate } = require('../utils/helper');
 
@@ -123,6 +124,33 @@ router.post('/api/v1/roles/create', async (req, res) => {
     res.status(statusCode).send(response);
   } catch (err) {
     logger.error('create role route', err);
+    res.status(STATUS_CODE_INTERNAL_SERVER_ERROR).send(err);
+  }
+});
+
+router.get('/api/v1/permissions', async (req, res) => {
+  try {
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    let results = await getPermissionsService();
+    if (results) {
+      responseType = SUCCESS;
+      statusCode = STATUS_CODE_SUCCESS;
+      data.details = results;
+      data.message = 'Fetched Details Successfully';
+    } else {
+      responseType = CUSTOM_RESPONSE;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.statusCode = statusCode;
+      customResponse.message = 'Failed to get response';
+      customResponse.messageCode = statusCode;
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('get permissions route', err);
     res.status(STATUS_CODE_INTERNAL_SERVER_ERROR).send(err);
   }
 });

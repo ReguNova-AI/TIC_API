@@ -33,8 +33,18 @@ const createRoleService = async (params) => {
   }
 };
 
+const getPermissionsService = async () => {
+  try {
+    const data = await roleQuery('GET_PERMISSIONS');
+    return data;
+  } catch (error) {
+    logger.error('get permissions service', error);
+  }
+};
+
 module.exports = {
   getRoleService,
   getSingleRoleService,
   createRoleService,
+  getPermissionsService,
 };
