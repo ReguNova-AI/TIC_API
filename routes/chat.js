@@ -50,6 +50,37 @@ router.post('/api/v1/chat/uploadStandardChat', async (req, res) => {
   }
 });
 
+router.post('/api/v2/chat/uploadStandardChat', async (req, res) => {
+  try {
+    const {
+      query: { imageKey = '' },
+    } = req;
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    const result = await uploadStandardCheckListService2(imageKey);
+    if (result.success) {
+      responseType = SUCCESS;
+      statusCode = STATUS_CODE_SUCCESS;
+      data = result;
+      data.message = 'Uploaded Successfully';
+    } else {
+      responseType = CUSTOM_RESPONSE;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.statusCode = statusCode;
+      customResponse.message = 'Failed to get response';
+      customResponse.messageCode = statusCode;
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('upload standard checklist v2 route: ', err);
+    res.status(500).send(err);
+  }
+});
+
+
 router.get('/api/v1/chat/askQuestion', async (req, res) => {
   try {
     const {
