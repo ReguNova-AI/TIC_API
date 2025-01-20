@@ -13,6 +13,9 @@ const roleQuery = async (queryType, params = {}) => {
       case 'GET_SINGLE_ROLE':
         query1 = `SELECT * FROM roles WHERE role_id = ${params.role_id};`;
         break;
+      case 'CREATE_ROLE':
+        query1 = `INSERT INTO roles (role_name, role_desc, permissions) VALUES ('${params.role_name}', '${params.role_desc}', '${JSON.stringify(params.permissions)}');`;
+        break;
     }
 
     return new Promise((resolve, reject) => {
