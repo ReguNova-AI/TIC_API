@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const FormData = require('form-data');
+const stream = require('stream');
+const { getFromS3 } = require('../config/aws_config');
 
 const PYTHON_SERVICE_URL = process.env.PYTHON_SERVICE_URL;
 
@@ -169,38 +171,118 @@ const uploadStandardCheckListService = async () => {
   }
 };
 
-const uploadProjectDocsService = async (params) => {
+const uploadStandardCheckListService2 = async (imageKey) => {
   try {
-    const files = Object.values(params);
+    // Step 1: Fetch the file from S3 (already a base64 string)
+    const getParams = {
+      Key: imageKey,
+      Bucket: process.env.BUCKET_NAME,
+    };
 
-    const response = await fetch(
-      `${PYTHON_SERVICE_URL}/upload_project_docs_summarize/`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: { 'form-data': { files } },
+    let s3Object = await getFromS3(getParams);
+
+    // Step 2: Decode base64 to binary data
+    const binaryData = Buffer.from(s3Object, 'base64');
+
+    // Define file path to save the PDF
+    const filePath = path.join(__dirname, '../utils/output-file.pdf');
+
+    // Step 3: Write the binary data to a PDF file using fs.promises.writeFile
+    await fs.promises.writeFile(filePath, binaryData);
+    console.log('File written successfully!');
+
+    // Step 4: Create FormData and append the PDF file to the form
+    const form = new FormData();
+    const fileStream = fs.createReadStream(filePath);
+
+    if (!fileStream) {
+      console.log('fileStream is not found');
+    }
+
+    form.append('file', fileStream, {
+      filename: 'your-file.pdf', // File name sent to the server
+      ContentType: 'application/pdf', // Ensure content type matches the file type
+      Accept: 'application/json',
+    });
+
+    // Step 5: Send the form data with the file to the API
+    const apiUrl = `${PYTHON_SERVICE_URL}/uploadstd_checklist_crt/`;
+
+    const response = await axios.post(apiUrl, form, {
+      headers: {
+        ...form.getHeaders(), // Automatically set appropriate headers for multipart/form-data
+        'User-Agent': 'MyCustomUserAgent/1.0', // Add custom User-Agent header
       },
-    );
-    console.log('response: ' + JSON.stringify(response));
+    });
 
-    
-    if (response.ok) {
-      const responseData = await response.json();
-      return { success: true, data: responseData };
+    // Step 6: Handle successful responses
+    if (response.status === 200) {
+      return { success: true, data: response.data };
     } else {
       // Handle non-OK responses
-      logger.error(
+      console.error(
         'Error: Non-OK response received',
         response.status,
         response.statusText,
       );
       return {
         success: false,
-        error: `Server returned status ${response.status}`,
+        error: `Server returned status ${response.statusText}`,
       };
     }
   } catch (error) {
-    logger.error('chat upload  service', error);
+    // Handle errors and log them
+    console.error('Upload service error:', error);
+    return { success: false, error: 'An error occurred while uploading files' };
+  }
+};
+
+const uploadProjectDocsService = async (params) => {
+  try {
+    const filePath = path.join(__dirname, '../utils/project doc.pdf');
+    const form = new FormData();
+
+    // Append the PDF file to the form
+    const fileStream = fs.createReadStream(filePath);
+    if (!fileStream) {
+      console.log('fileStream isnot found');
+    }
+
+    // Append the PDF file to the form
+    form.append('file', fileStream, {
+      filename: 'your-file.pdf', // File name sent to the server
+      ContentType: 'multipart/form-data; boundary=----boundary123',
+      Accept: 'application/json',
+    });
+
+    const apiUrl = `${PYTHON_SERVICE_URL}/upload_project_docs_summarize/`;
+
+    const response = await axios.post(apiUrl, form, {
+      headers: {
+        ...form.getHeaders(), // Automatically set appropriate headers for multipart/form-data
+        // Optional: Include your auth token if needed
+        'User-Agent': 'MyCustomUserAgent/1.0', // Add custom User-Agent header
+      },
+    });
+
+    // Handle successful responses
+    if (response.status === 200) {
+      return { success: true, data: response.data };
+    } else {
+      // Handle non-OK responses
+      console.error(
+        'Error: Non-OK response received',
+        response.status,
+        response.statusText,
+      );
+      return {
+        success: false,
+        error: `Server returned status ${response.statusText}`,
+      };
+    }
+  } catch (error) {
+    logger.error('Chat data service error', error);
+    return { response: false, error };
   }
 };
 
@@ -314,4 +396,5 @@ module.exports = {
   uploadProjectDocsService,
   chatDataService,
   chatRunComplainceAssessmentService,
+  uploadStandardCheckListService2,
 };

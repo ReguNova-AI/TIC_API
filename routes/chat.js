@@ -16,6 +16,7 @@ const {
   uploadProjectDocsService,
   chatDataService,
   chatRunComplainceAssessmentService,
+  uploadStandardCheckListService2,
 } = require('../service/chat_service');
 const { validate } = require('../utils/helper');
 
@@ -116,31 +117,63 @@ router.post('/api/v1/chat/uploadStandardCheckList', async (req, res) => {
   }
 });
 
+router.post('/api/v2/chat/uploadStandardCheckList', async (req, res) => {
+  try {
+    const {
+      query: { imageKey = '' },
+    } = req;
+    let data = {};
+    let responseType = '';
+    let statusCode = '';
+    let customResponse = {};
+    const result = await uploadStandardCheckListService2(imageKey);
+    if (result.success) {
+      responseType = SUCCESS;
+      statusCode = STATUS_CODE_SUCCESS;
+      data = result;
+      data.message = 'Checklist Uploaded Successfully';
+    } else {
+      responseType = CUSTOM_RESPONSE;
+      statusCode = STATUS_CODE_BAD_REQUEST;
+      customResponse.statusCode = statusCode;
+      customResponse.message = 'Failed to upload';
+      customResponse.messageCode = statusCode;
+      data = result;
+    }
+    let response = setResponse(responseType, '', data, customResponse);
+    res.status(statusCode).send(response);
+  } catch (err) {
+    logger.error('upload standard checklist route: ', err);
+    res.status(500).send(err);
+  }
+});
+
 router.post('/api/v1/chat/uploadProjectDocs', async (req, res) => {
   try {
     let data = {};
     let responseType = '';
     let statusCode = '';
     let customResponse = {};
-    if (req.files || Object.keys(req.files).length > 0) {
-      const result = await uploadProjectDocsService(req.files);
-      if (result.ok) {
-        responseType = SUCCESS;
-        statusCode = STATUS_CODE_SUCCESS;
-        data.details = result;
-        data.message = 'Documents Uploaded Successfully';
-      } else {
-        responseType = CUSTOM_RESPONSE;
-        statusCode = STATUS_CODE_BAD_REQUEST;
-        customResponse.statusCode = statusCode;
-        customResponse.message = 'Failed to upload';
-        customResponse.messageCode = statusCode;
-      }
+    // if (req.files || Object.keys(req.files).length > 0) {
+    // const result = await uploadProjectDocsService(req.files);
+    const result = await uploadProjectDocsService();
+    if (result.ok) {
+      responseType = SUCCESS;
+      statusCode = STATUS_CODE_SUCCESS;
+      data.details = result;
+      data.message = 'Documents Uploaded Successfully';
     } else {
-      responseType = BAD_REQUEST;
+      responseType = CUSTOM_RESPONSE;
       statusCode = STATUS_CODE_BAD_REQUEST;
-      customResponse.message = 'File is missing, Please upload file';
+      customResponse.statusCode = statusCode;
+      customResponse.message = 'Failed to upload';
+      customResponse.messageCode = statusCode;
     }
+    // } else {
+    //   responseType = BAD_REQUEST;
+    //   statusCode = STATUS_CODE_BAD_REQUEST;
+    //   customResponse.message = 'File is missing, Please upload file';
+    // }
     let response = setResponse(responseType, '', data, customResponse);
     res.status(statusCode).send(response);
   } catch (err) {
